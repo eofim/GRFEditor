@@ -29,11 +29,16 @@ namespace GRFEditor.Tools.MapExtractor {
 	/// Interaction logic for MapExtractor.xaml
 	/// </summary>
 	public partial class MapExtractor : UserControl, IProgress {
+		public const int SkipTreePreviewThreshold = 10;
+		public static readonly string[] SupportedExtensions = MapResourceCollector.SupportedExtensions;
+
 		private readonly AsyncOperation _asyncOperation;
+		private bool _bulkExportMode;
 		private readonly object _lock = new object();
 		private string _destinationPath;
 		private bool _userDestination;
 		private string _fileName;
+		private List<string> _fileNames = new List<string>();
 		private GrfHolder _grf;
 		private string _grfPath;
 		private MapResourceResolver _mapResourceResolver = new MapResourceResolver();
@@ -43,6 +48,7 @@ namespace GRFEditor.Tools.MapExtractor {
 			_grfPath = Path.GetDirectoryName(fileName);
 			_grf = grf;
 			_fileName = fileName;
+			_fileNames = new List<string> { fileName };
 
 			InitializeComponent();
 
@@ -61,7 +67,7 @@ namespace GRFEditor.Tools.MapExtractor {
 				_itemsResources.LoadResourcesInfo();
 				
 				if (!_asyncOperation.IsRunning)
-					_asyncOperation.SetAndRunOperation(new GrfThread(() => _updateMapFiles(_fileName, null), this, null, false, true));
+					_asyncOperation.SetAndRunOperation(new GrfThread(() => _updateMapFiles(_fileNames.Count > 0 ? _fileNames : new List<string> { _fileName }, null), this, null, false, true));
 			};
 			_itemsResources.LoadResourcesInfo();
 			_itemsResources.CanDeleteMainGrf = false;
@@ -138,15 +144,71 @@ namespace GRFEditor.Tools.MapExtractor {
 			}
 		}
 
+		public static bool IsSupportedFile(string relativePath) => MapResourceCollector.IsSupportedFile(relativePath);
+
+		public static List<string> NormalizeMapFileSelections(IEnumerable<string> relativePaths) => MapResourceCollector.NormalizeMapFileSelections(relativePaths);
+
+		public static void ExportMapsToFolder(GrfHolder grf, IList<string> mapFileNames, string destinationPath, bool userDestination, IProgress progress) {
+			var fileNames = NormalizeMapFileSelections(mapFileNames);
+
+			if (fileNames.Count == 0)
+				return;
+
+			var relativePaths = MapResourceCollector.CollectRelativePaths(fileNames, progress, () => progress.IsCancelled);
+			var multiGrf = GrfEditorConfiguration.Resources.MultiGrf;
+			var selectedNodes = relativePaths
+				.Select(p => new Utilities.Extension.Tuple<TkPath, string>(multiGrf.FindTkPath(p), p))
+				.Where(p => p.Item1 != null)
+				.GroupBy(p => p.Item2, StringComparer.OrdinalIgnoreCase)
+				.Select(p => p.First())
+				.ToList();
+
+			_writeExportedFiles(selectedNodes, destinationPath, userDestination, progress);
+		}
+
 		public void Reload(GrfHolder grf, string fileName, Func<bool> cancelMethod) {
+			ReloadMaps(grf, new[] { fileName }, cancelMethod);
+		}
+
+		public void ReloadMaps(GrfHolder grf, IList<string> fileNames, Func<bool> cancelMethod) {
 			if (_asyncOperation.IsRunning)
 				return;
 
-			_grfPath = Path.GetDirectoryName(fileName);
-			_grf = grf;
-			_fileName = fileName;
+			var normalized = NormalizeMapFileSelections(fileNames);
 
-			Task.Run(() => _updateMapFiles(fileName, cancelMethod));
+			if (normalized.Count == 0)
+				return;
+
+			_fileNames = normalized;
+			_fileName = normalized[0];
+			_grfPath = Path.GetDirectoryName(_fileName);
+			_grf = grf;
+			_bulkExportMode = normalized.Count >= SkipTreePreviewThreshold;
+
+			if (_bulkExportMode) {
+				_showBulkModeUi(normalized.Count);
+				return;
+			}
+
+			_hideBulkModeUi();
+			Task.Run(() => _updateMapFiles(normalized, cancelMethod));
+		}
+
+		private void _showBulkModeUi(int mapCount) {
+			this.Dispatch(delegate {
+				_treeViewMapExtractor.Items.Clear();
+				_quickPreview.ClearPreview();
+				_bulkModeTitle.Text = mapCount + " mapas selecionados";
+				_bulkModeOverlay.Visibility = Visibility.Visible;
+				_treeViewMapExtractor.Visibility = Visibility.Collapsed;
+			});
+		}
+
+		private void _hideBulkModeUi() {
+			this.Dispatch(delegate {
+				_bulkModeOverlay.Visibility = Visibility.Collapsed;
+				_treeViewMapExtractor.Visibility = Visibility.Visible;
+			});
 		}
 
 		private void _disableNode(MapExtractorTreeViewItem node, string tooltip = null) {
@@ -170,7 +232,7 @@ namespace GRFEditor.Tools.MapExtractor {
 			}
 		}
 
-		private void _updateMapFiles(string fileName, Func<bool> cancelToken) {
+		private void _updateMapFiles(IReadOnlyList<string> fileNames, Func<bool> cancelToken) {
 			try {
 				if (cancelToken == null)
 					cancelToken = () => false;
@@ -178,49 +240,50 @@ namespace GRFEditor.Tools.MapExtractor {
 				lock (_lock) {
 					if (cancelToken()) return;
 
-					string mapFile = Path.GetFileNameWithoutExtension(fileName);
-					string expandExt = fileName.GetExtension();
 					Progress = -1;
 
 					_treeViewMapExtractor.Dispatch(p => p.Items.Clear());
 					_quickPreview.ClearPreview();
-					bool isMapFile = fileName.IsExtension(".rsw", ".gat", ".gnd");
 
-					if (fileName.IsExtension(".rsm")) {
-						if (cancelToken()) return;
-						_addNode(cancelToken, new MapResourcePath(_grfPath, mapFile + ".rsm"), _treeViewMapExtractor.Items);
-					}
-					else if (fileName.IsExtension(".rsm2")) {
-						if (cancelToken()) return;
-						_addNode(cancelToken, new MapResourcePath(_grfPath, mapFile + ".rsm2"), _treeViewMapExtractor.Items);
-					}
-					else if (fileName.IsExtension(".str")) {
-						if (cancelToken()) return;
-						_addNode(cancelToken, new MapResourcePath(_grfPath, mapFile + ".str"), _treeViewMapExtractor.Items);
-					}
-					else {
-						if (cancelToken()) return;
-						_addNode(cancelToken, new MapResourcePath(@"data\", mapFile + ".gnd"), _treeViewMapExtractor.Items, isMapFile);
-						if (cancelToken()) return;
-						_addNode(cancelToken, new MapResourcePath(@"data\", mapFile + ".rsw"), _treeViewMapExtractor.Items, isMapFile);
-						if (cancelToken()) return;
-						_addNode(cancelToken, new MapResourcePath(@"data\", mapFile + ".gat"), _treeViewMapExtractor.Items, isMapFile);
+					bool groupByMap = fileNames.Count > 1;
 
-						if (GrfEditorConfiguration.Resources.MultiGrf.Exists(@"data\luafiles514\lua files\effecttool\" + mapFile + ".lub")) {
-							_addNode(cancelToken, new MapResourcePath(@"data\luafiles514\lua files\effecttool\", mapFile + ".lub"), _treeViewMapExtractor.Items, isMapFile);
+					foreach (string fileName in fileNames) {
+						if (cancelToken()) return;
+
+						ItemCollection parent = _treeViewMapExtractor.Items;
+
+						if (groupByMap) {
+							MapExtractorTreeViewItem groupNode = null;
+
+							this.Dispatch(delegate {
+								groupNode = new MapExtractorTreeViewItem(_treeViewMapExtractor, _tvSharedEvent);
+								groupNode.HeaderText = Path.GetFileNameWithoutExtension(fileName);
+								groupNode.IsChecked = true;
+								groupNode.IsExpanded = true;
+								_treeViewMapExtractor.Items.Add(groupNode);
+							});
+
+							parent = groupNode.Items;
 						}
+
+						_addMapRootNodes(cancelToken, fileName, parent);
 					}
 
 					if (cancelToken()) return;
-					_treeViewMapExtractor.Dispatch(delegate {
-						foreach (MapExtractorTreeViewItem node in _treeViewMapExtractor.Items) {
-							if (node.HeaderText.IsExtension(expandExt)) {
-								if (node.IsChecked == true) {
-									node.IsExpanded = true;
+
+					if (!groupByMap && fileNames.Count > 0) {
+						string expandExt = fileNames[0].GetExtension();
+
+						_treeViewMapExtractor.Dispatch(delegate {
+							foreach (MapExtractorTreeViewItem node in _treeViewMapExtractor.Items) {
+								if (node.HeaderText.IsExtension(expandExt)) {
+									if (node.IsChecked == true) {
+										node.IsExpanded = true;
+									}
 								}
 							}
-						}
-					});
+						});
+					}
 				}
 			}
 			catch (Exception err) {
@@ -228,6 +291,15 @@ namespace GRFEditor.Tools.MapExtractor {
 			}
 			finally {
 				Progress = 100;
+			}
+		}
+
+		private void _addMapRootNodes(Func<bool> cancelToken, string fileName, ItemCollection parent) {
+			bool isMapFile = fileName.IsExtension(".rsw", ".gat", ".gnd");
+
+			foreach (MapResourcePath root in MapResourceCollector.GetMapRootPaths(fileName)) {
+				if (cancelToken()) return;
+				_addNode(cancelToken, root, parent, isMapFile);
 			}
 		}
 
@@ -309,7 +381,7 @@ namespace GRFEditor.Tools.MapExtractor {
 					}
 				}
 				else {
-					if (node.IsChecked == true && node.CheckBoxHeaderIsEnabled) {
+					if (node.IsChecked == true && node.CheckBoxHeaderIsEnabled && node.ResourcePath != null) {
 						paths.Add(new Utilities.Extension.Tuple<TkPath, string>(node.ResourcePath, node.RelativeGrfPath));
 					}
 
@@ -373,7 +445,7 @@ namespace GRFEditor.Tools.MapExtractor {
 		public void Export() {
 			_userDestination = false;
 			_destinationPath = Configuration.OverrideExtractionPath ? Configuration.DefaultExtractingPath : Path.GetDirectoryName(new FileInfo(_grf.FileName).FullName);
-			_asyncOperation.SetAndRunOperation(new GrfThread(_export, this), _openFolderCallback);
+			_asyncOperation.SetAndRunOperation(new GrfThread(() => _export(this), this), _openFolderCallback);
 		}
 
 		public void ExportAt() {
@@ -382,57 +454,112 @@ namespace GRFEditor.Tools.MapExtractor {
 			if (path != null) {
 				_userDestination = true;
 				_destinationPath = path;
-				_asyncOperation.SetAndRunOperation(new GrfThread(_export, this), _openFolderCallback);
+				_asyncOperation.SetAndRunOperation(new GrfThread(() => _export(this), this), _openFolderCallback);
 			}
 		}
 
-		private void _export() {
+		private bool _shouldExportFromMapList() {
+			return _bulkExportMode || _asyncOperation.IsRunning;
+		}
+
+		private List<Utilities.Extension.Tuple<TkPath, string>> _collectPathsFromMapList(IProgress progress) {
+			var relativePaths = MapResourceCollector.CollectRelativePaths(_fileNames, progress, () => IsCancelled);
+			var multiGrf = GrfEditorConfiguration.Resources.MultiGrf;
+
+			return relativePaths
+				.Select(p => new Utilities.Extension.Tuple<TkPath, string>(multiGrf.FindTkPath(p), p))
+				.Where(p => p.Item1 != null)
+				.GroupBy(p => p.Item2, StringComparer.OrdinalIgnoreCase)
+				.Select(p => p.First())
+				.ToList();
+		}
+
+		private void _export(IProgress progress) {
 			try {
-				Progress = -1;
+				List<Utilities.Extension.Tuple<TkPath, string>> selectedNodes;
 
-				List<Utilities.Extension.Tuple<TkPath, string>> selectedNodes = _getSelectedNodes(null).GroupBy(p => p.Item1.GetFullPath()).Select(p => p.First()).ToList();
-				string commonRoot = "";
-
-				if (_userDestination) {
-					// Find common root
-					var splitPaths = selectedNodes
-						.Select(p => p.Item2.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar))
+				if (_shouldExportFromMapList()) {
+					selectedNodes = _collectPathsFromMapList(progress);
+				}
+				else {
+					selectedNodes = _getSelectedNodes(null)
+						.Where(p => p.Item1 != null)
+						.GroupBy(p => p.Item1.GetFullPath())
+						.Select(p => p.First())
 						.ToList();
-
-					var commonPrefixParts = splitPaths
-						.First()
-						.TakeWhile((part, index) => splitPaths.All(p => p.Length > index && string.Equals(p[index], part, StringComparison.OrdinalIgnoreCase)))
-						.ToArray();
-
-					commonRoot = string.Join("" + Path.DirectorySeparatorChar, commonPrefixParts);
 				}
 
-				List<string> pathsToCreate = selectedNodes.Select(p => Path.Combine(_destinationPath, Path.GetDirectoryName(p.Item2.ReplaceFirst(commonRoot, "").TrimStart('\\')))).Distinct().ToList();
+				_writeExportedFiles(selectedNodes, _destinationPath, _userDestination, progress);
+
+				if (selectedNodes.Count > 0) {
+					string commonRoot = _getCommonRoot(selectedNodes, _userDestination);
+					var firstDir = selectedNodes
+						.Select(p => Path.Combine(_destinationPath, Path.GetDirectoryName(p.Item2.ReplaceFirst(commonRoot, "").TrimStart('\\'))))
+						.FirstOrDefault(p => !String.IsNullOrEmpty(p));
+
+					if (!String.IsNullOrEmpty(firstDir))
+						_destinationPath = firstDir;
+				}
+			}
+			catch (Exception err) {
+				ErrorHandler.HandleException(err);
+			}
+		}
+
+		private static string _getCommonRoot(List<Utilities.Extension.Tuple<TkPath, string>> selectedNodes, bool userDestination) {
+			if (!userDestination || selectedNodes.Count == 0)
+				return "";
+
+			var splitPaths = selectedNodes
+				.Select(p => p.Item2.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar))
+				.ToList();
+
+			var commonPrefixParts = splitPaths
+				.First()
+				.TakeWhile((part, index) => splitPaths.All(p => p.Length > index && string.Equals(p[index], part, StringComparison.OrdinalIgnoreCase)))
+				.ToArray();
+
+			return string.Join("" + Path.DirectorySeparatorChar, commonPrefixParts);
+		}
+
+		private static void _writeExportedFiles(List<Utilities.Extension.Tuple<TkPath, string>> selectedNodes, string destinationPath, bool userDestination, IProgress progress) {
+			try {
+				progress.Progress = -1;
+
+				if (selectedNodes.Count == 0)
+					return;
+
+				string commonRoot = _getCommonRoot(selectedNodes, userDestination);
+
+				List<string> pathsToCreate = selectedNodes
+					.Select(p => Path.Combine(destinationPath, Path.GetDirectoryName(p.Item2.ReplaceFirst(commonRoot, "").TrimStart('\\'))))
+					.Where(p => !String.IsNullOrEmpty(p))
+					.Distinct()
+					.ToList();
 
 				foreach (string pathToCreate in pathsToCreate) {
+					if (progress.IsCancelled) return;
+
 					if (!Directory.Exists(pathToCreate))
 						Directory.CreateDirectory(pathToCreate);
 				}
 
 				for (int index = 0; index < selectedNodes.Count; index++) {
-					string relativePath = selectedNodes[index].Item2;
+					if (progress.IsCancelled) return;
 
-					string outputPath = Path.Combine(_destinationPath, relativePath.ReplaceFirst(commonRoot, "").TrimStart('\\'));
+					string relativePath = selectedNodes[index].Item2;
+					string outputPath = Path.Combine(destinationPath, relativePath.ReplaceFirst(commonRoot, "").TrimStart('\\'));
 
 					File.WriteAllBytes(outputPath, GrfEditorConfiguration.Resources.MultiGrf.GetData(relativePath));
 
-					Progress = (float)(index + 1) / selectedNodes.Count * 100f;
+					progress.Progress = 50f + (float)(index + 1) / selectedNodes.Count * 50f;
 				}
-
-				// Find topmost directory
-				if (pathsToCreate.Count > 0)
-					_destinationPath = pathsToCreate[0];
 			}
 			catch (Exception err) {
 				ErrorHandler.HandleException(err);
 			}
 			finally {
-				Progress = 100f;
+				progress.Progress = 100f;
 			}
 		}
 		#endregion

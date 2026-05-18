@@ -1,5 +1,6 @@
 ﻿using GRF;
 using GRF.FileFormats.GndFormat;
+using GRF.Threading;
 using GRF.FileFormats.LubFormat;
 using GRF.FileFormats.RsmFormat;
 using GRF.FileFormats.RswFormat;
@@ -25,6 +26,136 @@ namespace GRFEditor.WPF.PreviewTabs.Controls {
 			ParentDirectory = parentDirectory;
 			NodeDisplayPath = nodeDisplayPath;
 			RelativePath = GrfPath.Combine(ParentDirectory, NodeDisplayPath);
+		}
+	}
+
+	public class MapResourceCollector {
+		public static readonly string[] SupportedExtensions = { ".rsm", ".rsm2", ".gat", ".rsw", ".gnd", ".str" };
+
+		public static bool IsSupportedFile(string relativePath) {
+			return SupportedExtensions.Any(p => relativePath.GetExtension() == p);
+		}
+
+		public static List<string> NormalizeMapFileSelections(IEnumerable<string> relativePaths) {
+			var preferred = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+			var priority = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase) {
+				{ ".rsw", 0 },
+				{ ".gnd", 1 },
+				{ ".gat", 2 },
+				{ ".str", 3 },
+				{ ".rsm", 4 },
+				{ ".rsm2", 5 },
+			};
+
+			foreach (string relativePath in relativePaths) {
+				if (!IsSupportedFile(relativePath))
+					continue;
+
+				string key = _getMapDedupKey(relativePath);
+				string ext = relativePath.GetExtension();
+				int rank = priority.ContainsKey(ext) ? priority[ext] : 99;
+
+				if (!preferred.ContainsKey(key)) {
+					preferred[key] = relativePath;
+				}
+				else {
+					string existingExt = preferred[key].GetExtension();
+					int existingRank = priority.ContainsKey(existingExt) ? priority[existingExt] : 99;
+
+					if (rank < existingRank)
+						preferred[key] = relativePath;
+				}
+			}
+
+			return preferred.Values.OrderBy(p => Path.GetFileNameWithoutExtension(p), StringComparer.OrdinalIgnoreCase).ToList();
+		}
+
+		private static string _getMapDedupKey(string relativePath) {
+			string ext = relativePath.GetExtension();
+
+			if (ext == ".rsm" || ext == ".rsm2" || ext == ".str")
+				return relativePath;
+
+			string mapName = Path.GetFileNameWithoutExtension(relativePath);
+			string directory = Path.GetDirectoryName(relativePath);
+
+			if (String.IsNullOrEmpty(directory))
+				return mapName;
+
+			return directory + "\\" + mapName;
+		}
+
+		public static List<MapResourcePath> GetMapRootPaths(string fileName) {
+			string grfPath = Path.GetDirectoryName(fileName);
+			string mapFile = Path.GetFileNameWithoutExtension(fileName);
+			var roots = new List<MapResourcePath>();
+
+			if (fileName.IsExtension(".rsm")) {
+				roots.Add(new MapResourcePath(grfPath, mapFile + ".rsm"));
+			}
+			else if (fileName.IsExtension(".rsm2")) {
+				roots.Add(new MapResourcePath(grfPath, mapFile + ".rsm2"));
+			}
+			else if (fileName.IsExtension(".str")) {
+				roots.Add(new MapResourcePath(grfPath, mapFile + ".str"));
+			}
+			else {
+				roots.Add(new MapResourcePath(@"data\", mapFile + ".gnd"));
+				roots.Add(new MapResourcePath(@"data\", mapFile + ".rsw"));
+				roots.Add(new MapResourcePath(@"data\", mapFile + ".gat"));
+
+				if (GrfEditorConfiguration.Resources.MultiGrf.Exists(@"data\luafiles514\lua files\effecttool\" + mapFile + ".lub")) {
+					roots.Add(new MapResourcePath(@"data\luafiles514\lua files\effecttool\", mapFile + ".lub"));
+				}
+			}
+
+			return roots;
+		}
+
+		public static HashSet<string> CollectRelativePaths(IEnumerable<string> mapFileNames, IProgress progress = null, Func<bool> cancelToken = null) {
+			var resolver = new MapResourceResolver();
+			var normalized = NormalizeMapFileSelections(mapFileNames);
+			var collected = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+			var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+			for (int mapIndex = 0; mapIndex < normalized.Count; mapIndex++) {
+				if (cancelToken != null && cancelToken())
+					break;
+
+				foreach (MapResourcePath root in GetMapRootPaths(normalized[mapIndex])) {
+					_collectRecursive(resolver, root, collected, visited, cancelToken);
+				}
+
+				if (progress != null && normalized.Count > 0)
+					progress.Progress = (float)(mapIndex + 1) / normalized.Count * 50f;
+			}
+
+			return collected;
+		}
+
+		private static void _collectRecursive(MapResourceResolver resolver, MapResourcePath resource, HashSet<string> collected, HashSet<string> visited, Func<bool> cancelToken) {
+			if (cancelToken != null && cancelToken())
+				return;
+
+			string relativePath = resource.RelativePath;
+
+			if (!visited.Add(relativePath))
+				return;
+
+			var multiGrf = GrfEditorConfiguration.Resources.MultiGrf;
+
+			if (!multiGrf.Exists(relativePath))
+				return;
+
+			collected.Add(relativePath);
+
+			try {
+				foreach (MapResourcePath child in resolver.GetMapResources(resource)) {
+					_collectRecursive(resolver, child, collected, visited, cancelToken);
+				}
+			}
+			catch {
+			}
 		}
 	}
 

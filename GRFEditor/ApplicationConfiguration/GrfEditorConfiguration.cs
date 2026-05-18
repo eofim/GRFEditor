@@ -1136,6 +1136,14 @@ namespace GRFEditor.ApplicationConfiguration {
 
 		#region Grf compression
 
+		public static int CompressionLevel {
+			get {
+				int level = Int32.Parse(ConfigAsker["[Compression - Zlib compression level]", "9"], CultureInfo.InvariantCulture);
+				return Math.Max(0, Math.Min(9, level));
+			}
+			set { ConfigAsker["[Compression - Zlib compression level]"] = Math.Max(0, Math.Min(9, value)).ToString(CultureInfo.InvariantCulture); }
+		}
+
 		public static bool CoIdenticalFiles {
 			get { return Boolean.Parse(ConfigAsker["[Compression - General compression - Remove identical files]", true.ToString()]); }
 			set { ConfigAsker["[Compression - General compression - Remove identical files]"] = value.ToString(); }

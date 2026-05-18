@@ -38,6 +38,13 @@ namespace GRF.IO {
 
 						data = _srb.ReadMisaligned(sortedEntries, out toIndex, fromIndex, indexMax, originalStream.Value, out _);
 
+						if (data == null) {
+							if (toIndex <= fromIndex)
+								toIndex = fromIndex + 1;
+
+							continue;
+						}
+
 						for (int i = fromIndex; i < toIndex; i++) {
 							if (_grfData.IsCancelling)
 								return;

@@ -78,6 +78,8 @@
                     <Label Content="Tools" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="-5 0 -5 0" />
                 </MenuItem.Header>
                 <MenuItem Name="_menuItemValidateGrf" TokeiLibrary:WpfProperties.ImagePath="validity.png" Header="Grf validation" Click="_menuItemValidateGrf_Click" />
+                <MenuItem Name="_menuItemHardCompression" TokeiLibrary:WpfProperties.ImagePath="pack.png" Header="Hard compression (LZMA)..." Click="_menuItemHardCompression_Click"
+                          ToolTip="Recompresses the entire GRF with LZMA and removes duplicate entries. Not compatible with the official Ragnarok client." />
                 <MenuItem Name="_menuItemOpenProgramData" TokeiLibrary:WpfProperties.ImagePath="newFolder.png" Click="_menuItemOpenProgramData_Click" Header="Open roaming data" />
                 <Separator />
                 <MenuItem Name="_menuItemImportSprite" TokeiLibrary:WpfProperties.ImagePath="convert.png" Header="Import sprite..." Click="_menuItemImportSprite_Click" />

@@ -11,6 +11,7 @@ using System.Windows.Input;
 using ErrorManager;
 using GRF.Core;
 using GRF.IO;
+using GRF.Threading;
 using GRFEditor.ApplicationConfiguration;
 using GRFEditor.Core;
 using GRFEditor.Core.Services;
@@ -93,14 +94,28 @@ namespace GRFEditor {
 
 		private void _menuItemsExportMapFiles_Click(object sender, RoutedEventArgs e) {
 			ListView items = WpfUtilities.GetPlacementFromContextMenu<ListView>(sender as FrameworkElement);
+			var mapFiles = items.SelectedItems.Cast<FileEntry>()
+				.Select(p => p.RelativePath)
+				.Where(MapExtractor.IsSupportedFile)
+				.ToList();
 
-			if (items.SelectedItem != null && items.SelectedItem as FileEntry != null) {
-				FileEntry entry = (FileEntry) items.SelectedItem;
+			if (mapFiles.Count == 0)
+				return;
 
-				if (new string[] { ".rsm", ".rsm2", ".gat", ".rsw", ".gnd" }.Any(p => entry.RelativePath.GetExtension() == p)) {
-					WindowProvider.ShowWindow(new MapExtractorDialog(_grfHolder, entry.RelativePath), this);
-				}
+			if (mapFiles.Count >= MapExtractor.SkipTreePreviewThreshold) {
+				string path = PathRequest.FolderExtract();
+
+				if (path == null)
+					return;
+
+				string destinationPath = path;
+				_asyncOperation.SetAndRunOperation(
+					new GrfThread(() => MapExtractor.ExportMapsToFolder(_grfHolder, mapFiles, destinationPath, true, _grfHolder), _grfHolder),
+					_ => Utilities.Services.OpeningService.FileOrFolder(destinationPath));
+				return;
 			}
+
+			WindowProvider.ShowWindow(new MapExtractorDialog(_grfHolder, mapFiles), this);
 		}
 
 		private void _menuItemsEncrypt_Click(object sender, RoutedEventArgs e) {
@@ -348,6 +363,7 @@ namespace GRFEditor {
 				ListViewItem lvi = _items.GetObjectAtPoint<ListViewItem>(e.GetPosition(_items));
 
 				if (lvi != null) {
+					var selectedEntries = _items.SelectedItems.Cast<FileEntry>().ToList();
 					FileEntry entry = (FileEntry) _items.SelectedItem;
 
 					_miSaveMapAs.Visibility = new string[] { ".rsw", ".gnd", ".gat" }.Any(p => entry.RelativePath.GetExtension() == p) ? Visibility.Visible : Visibility.Collapsed;
@@ -355,7 +371,7 @@ namespace GRFEditor {
 					_miConvertRsw_Anim.Visibility = new string[] { ".rsw", ".gnd", ".gat" }.Any(p => entry.RelativePath.GetExtension() == p) ? Visibility.Visible : Visibility.Collapsed;
 					_miConvertRsm_Anim.Visibility = new string[] { ".rsm2" }.Any(p => entry.RelativePath.GetExtension() == p) ? Visibility.Visible : Visibility.Collapsed;
 					_miConvertRsm_Flat.Visibility = new string[] { ".rsm2" }.Any(p => entry.RelativePath.GetExtension() == p) ? Visibility.Visible : Visibility.Collapsed;
-					_miExportMapFiles.Visibility = new string[] { ".rsw", ".rsm", ".rsm2", ".gnd", ".gat" }.Any(p => entry.RelativePath.GetExtension() == p) ? Visibility.Visible : Visibility.Collapsed;
+					_miExportMapFiles.Visibility = selectedEntries.Any(p => MapExtractor.IsSupportedFile(p.RelativePath)) ? Visibility.Visible : Visibility.Collapsed;
 
 					_miSelect.Visibility = Visibility.Collapsed;
 

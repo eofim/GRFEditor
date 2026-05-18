@@ -63,7 +63,12 @@ namespace GRF.Core.GrfCompression {
 			IntPtr intPtr = NativeMethods.GetProcAddress(_hModule, "uncompress");
 			_decompress = (DecompressMethod) Marshal.GetDelegateForFunctionPointer(intPtr, typeof (DecompressMethod));
 
-			intPtr = NativeMethods.GetProcAddress(_hModule, "zlib_compress");
+			_compressionLevel = 9;
+
+			intPtr = NativeMethods.GetProcAddress(_hModule, "compress2");
+
+			if (intPtr == IntPtr.Zero)
+				intPtr = NativeMethods.GetProcAddress(_hModule, "zlib_compress");
 
 			if (intPtr == IntPtr.Zero)
 				intPtr = NativeMethods.GetProcAddress(_hModule, "compress");

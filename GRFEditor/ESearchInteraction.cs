@@ -13,6 +13,7 @@ using GRF.Core;
 using GRF.Threading;
 using GRFEditor.Core;
 using GRFEditor.OpenGL.MapComponents;
+using GRFEditor.Tools.MapExtractor;
 using GrfToWpfBridge;
 using TokeiLibrary;
 using TokeiLibrary.Shortcuts;
@@ -63,6 +64,7 @@ namespace GRFEditor {
 				}
 
 				if (_listBoxResults.SelectedItem != null) {
+					var selectedEntries = _listBoxResults.SelectedItems.Cast<FileEntry>().ToList();
 					FileEntry entry = (FileEntry)_listBoxResults.SelectedItem;
 
 					_miSaveMapAs.Visibility = new string[] { ".rsw", ".gnd", ".gat" }.Any(p => entry.RelativePath.GetExtension() == p) ? Visibility.Visible : Visibility.Collapsed;
@@ -70,7 +72,7 @@ namespace GRFEditor {
 					_miConvertRsw_Anim.Visibility = new string[] { ".rsw", ".gnd", ".gat" }.Any(p => entry.RelativePath.GetExtension() == p) ? Visibility.Visible : Visibility.Collapsed;
 					_miConvertRsm_Anim.Visibility = new string[] { ".rsm2" }.Any(p => entry.RelativePath.GetExtension() == p) ? Visibility.Visible : Visibility.Collapsed;
 					_miConvertRsm_Flat.Visibility = new string[] { ".rsm2" }.Any(p => entry.RelativePath.GetExtension() == p) ? Visibility.Visible : Visibility.Collapsed;
-					_miExportMapFiles.Visibility = new string[] { ".rsw", ".rsm", ".rsm2", ".gnd", ".gat" }.Any(p => entry.RelativePath.GetExtension() == p) ? Visibility.Visible : Visibility.Collapsed;
+					_miExportMapFiles.Visibility = selectedEntries.Any(p => MapExtractor.IsSupportedFile(p.RelativePath)) ? Visibility.Visible : Visibility.Collapsed;
 
 					_miFlagRemove.Visibility = _grfHolder.FileName.IsExtension(".thor") ? Visibility.Visible : Visibility.Collapsed;
 

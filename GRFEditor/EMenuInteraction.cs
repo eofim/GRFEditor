@@ -62,6 +62,7 @@ namespace GRFEditor {
 
 		private void _menuItemSave_Click(object sender, RoutedEventArgs e) => _save(GrfEditorSaveMode.QuickSave);
 		private void _menuItemRepack_Click(object sender, RoutedEventArgs e) => _save(GrfEditorSaveMode.Repack);
+		private void _menuItemHardCompression_Click(object sender, RoutedEventArgs e) => _save(GrfEditorSaveMode.HardCompression);
 		private void _menuItemTableEncrypt_Click(object sender, RoutedEventArgs e) => _save(GrfEditorSaveMode.TableEncrypt);
 		private void _menuItemSaveAs_Click(object sender, RoutedEventArgs e) => _save(GrfEditorSaveMode.SaveAs);
 
@@ -69,6 +70,7 @@ namespace GRFEditor {
 			QuickSave,
 			SaveAs,
 			Repack,
+			HardCompression,
 			TableEncrypt,
 			Defragment,
 			Compact,
@@ -91,6 +93,54 @@ namespace GRFEditor {
 						}
 						break;
 					case GrfEditorSaveMode.Repack:
+						break;
+					case GrfEditorSaveMode.HardCompression:
+						string hardCompressionExtension = _grfHolder.FileName.GetExtension();
+
+						if (hardCompressionExtension != ".grf" && hardCompressionExtension != ".gpf") {
+							ErrorHandler.HandleException("Hard compression is only available for GRF and GPF files.");
+							return;
+						}
+
+						if (!Compression.LzmaCompression.Success) {
+							ErrorHandler.HandleException("The LZMA compression library could not be loaded. Check Settings > General > Compression method or install the Visual C++ Redistributable.");
+							return;
+						}
+
+						if (_grfHolder.IsNewGrf) {
+							ErrorHandler.HandleException("Save the GRF to disk before using hard compression.");
+							return;
+						}
+
+						if (!ErrorHandler.YesNoRequest(
+							"This will recompress the entire GRF using LZMA (maximum compression) and remove duplicate file indexes.\r\n\r\n" +
+							"The result is NOT compatible with the official Ragnarok Online client.\r\n\r\n" +
+							"Continue?",
+							"Hard compression")) {
+							return;
+						}
+
+						if (_grfHolder.IsModified) {
+							MessageBoxResult savePending = WindowProvider.ShowDialog(
+								"The GRF has unsaved changes. Save them before hard compression?",
+								"Modified GRF",
+								MessageBoxButton.YesNoCancel);
+
+							if (savePending == MessageBoxResult.Cancel)
+								return;
+
+							if (savePending == MessageBoxResult.Yes) {
+								ContainerSaveResult pendingSave = _grfHolder.Save();
+
+								if (!pendingSave.Success) {
+									if (pendingSave.Error != null)
+										ErrorHandler.HandleException(pendingSave.Error);
+
+									return;
+								}
+							}
+						}
+
 						break;
 					case GrfEditorSaveMode.SaveAs:
 						string extension = _grfHolder.FileName.GetExtension();
@@ -140,6 +190,9 @@ namespace GRFEditor {
 						case GrfEditorSaveMode.Repack:
 							result = _grfHolder.RepackAs(file);
 							break;
+						case GrfEditorSaveMode.HardCompression:
+							result = _grfHolder.HardCompress();
+							break;
 						case GrfEditorSaveMode.Compact:
 							result = _grfHolder.Compact();
 							break;
@@ -168,6 +221,9 @@ namespace GRFEditor {
 							else
 								_reloadContainer(result.NewFileName);
 						}
+
+						if (mode == GrfEditorSaveMode.HardCompression && result.Success)
+							_grfHolder.ApplyLzmaCompressedFlags();
 					}
 					catch (Exception err) {
 						ErrorHandler.HandleException(err);

@@ -6,6 +6,7 @@ using System.Text;
 using ErrorManager;
 using GRF.ContainerFormat;
 using GRF.ContainerFormat.Commands;
+using GRF.Core.GrfCompression;
 using GRF.FileFormats.RgzFormat;
 using GRF.IO;
 using GRF.GrfSystem;
@@ -342,6 +343,37 @@ namespace GRF.Core {
 		}
 
 		/// <summary>
+		/// Marks file entries as LZMA-compressed without reading the data stream.
+		/// Used after hard compression when every compressible entry was written with LZMA.
+		/// </summary>
+		public void ApplyLzmaCompressedFlags() {
+			_validateOperation(Condition.Opened);
+
+			foreach (FileEntry entry in FileTable.Entries) {
+				if ((entry.Flags & EntryType.Directory) == EntryType.Directory)
+					continue;
+
+				if ((entry.Flags & EntryType.RemoveFile) == EntryType.RemoveFile)
+					continue;
+
+				if (entry.SizeCompressed <= 0)
+					continue;
+
+				if ((entry.Flags & EntryType.GravityEncryptedFile) == EntryType.GravityEncryptedFile)
+					continue;
+
+				if ((entry.Flags & EntryType.LZSS) == EntryType.LZSS)
+					continue;
+
+				if ((entry.Flags & EntryType.RawDataFile) == EntryType.RawDataFile)
+					continue;
+
+				entry.Flags |= EntryType.LzmaCompressed;
+				entry.OnPropertyChanged("LzmaCompressed");
+			}
+		}
+
+		/// <summary>
 		/// Detects the encrypted files and sets the flag.
 		/// </summary>
 		public void SetCustomCompressionFlag() {
@@ -387,6 +419,40 @@ namespace GRF.Core {
 			_internalGrf = null;
 
 			OnContainerClosed();
+		}
+
+		/// <summary>
+		/// Repacks all entries with LZMA (maximum level), then compacts duplicate indexes.
+		/// </summary>
+		public ContainerSaveResult HardCompress() {
+			_validateOperation(Condition.Opened);
+
+			string extension = _internalGrf.FileName.GetExtension();
+
+			if (extension != ".grf" && extension != ".gpf")
+				throw GrfExceptions.__InvalidContainerFormat.Create(_internalGrf.FileName, ".grf or .gpf");
+
+			if (!Compression.LzmaCompression.Success)
+				throw GrfExceptions.__CompressionDllFailed2.Create("lzma.dll", "Microsoft Visual C++ 2022 (x64)");
+
+			ICompression previousAlgorithm = Compression.CompressionAlgorithm;
+			int previousLevel = Settings.CompressionLevel;
+
+			try {
+				Compression.CompressionAlgorithm = Compression.LzmaCompression;
+				Settings.CompressionLevel = 9;
+
+				ContainerSaveResult result = Repack();
+
+				if (!result.Success)
+					return result;
+
+				return Compact();
+			}
+			finally {
+				Compression.CompressionAlgorithm = previousAlgorithm;
+				Settings.CompressionLevel = previousLevel;
+			}
 		}
 
 		/// <summary>

@@ -14,8 +14,8 @@
         </Grid>
         <Grid TokeiLibrary:WpfProperties.IsDraggable="True" Grid.Row="1" Height="40" Background="{DynamicResource UIDialogBackground}">
             <DockPanel HorizontalAlignment="Right" Margin="0 0 3 0">
-                <Button Name="_buttonExport" Content="Export" Height="24" Margin="3" Width="100" Click="_buttonExport_Click" />
-                <Button Name="_buttonExportAt" Content="Export to..." Height="24" Margin="3" Width="100" Click="_buttonExportAt_Click" />
+                <Button Name="_buttonExport" Content="Export all" Height="24" Margin="3" Width="110" Click="_buttonExport_Click" ToolTip="Export resources (works immediately in bulk mode, no tree loading required)" />
+                <Button Name="_buttonExportAt" Content="Export to..." Height="24" Margin="3" Width="110" Click="_buttonExportAt_Click" ToolTip="Choose folder and export all resources from selected maps" />
                 <Button Content="Close" Height="24" Margin="3" Width="100" Click="_buttonClose" />
             </DockPanel>
         </Grid>

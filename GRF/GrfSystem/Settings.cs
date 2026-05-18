@@ -5,7 +5,7 @@ namespace GRF.GrfSystem {
 	public static class Settings {
 		public static int MaximumNumberOfThreads = 10;
 
-		public static int CompressionLevel = 6;
+		public static int CompressionLevel = 9;
 		private static string _tempPath = "tmp";
 		public static bool CpuMonitoringEnabled = true;
 		public static bool LockFiles { get; set; }

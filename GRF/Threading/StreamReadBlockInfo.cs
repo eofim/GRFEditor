@@ -84,8 +84,19 @@ namespace GRF.Threading {
 			int totalRead = 0;
 			bufferReadLength -= indexBufferStart;
 
+			if (bufferReadLength <= 0 || processedEntryCount <= 0) {
+				toIndex = indexFrom + Math.Max(processedEntryCount, 1);
+				dataLength = 0;
+				return _readBuffer;
+			}
+
 			do {
-				totalRead += stream.Read(_readBuffer, totalRead + indexBufferStart, (int)bufferReadLength - totalRead);
+				int bytesToRead = (int)bufferReadLength - totalRead;
+
+				if (bytesToRead <= 0)
+					break;
+
+				totalRead += stream.Read(_readBuffer, totalRead + indexBufferStart, bytesToRead);
 				ReadCalls++;
 			} while (totalRead < bufferReadLength);
 

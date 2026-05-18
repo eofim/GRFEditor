@@ -150,7 +150,6 @@
     <Compile Include="TestControl.xaml.cs">
       <DependentUpon>TestControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="TestDecompression.cs" />
     <Compile Include="TestWindow.xaml.cs">
       <DependentUpon>TestWindow.xaml</DependentUpon>
     </Compile>

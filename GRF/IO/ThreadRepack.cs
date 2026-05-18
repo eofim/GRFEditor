@@ -90,6 +90,11 @@ namespace GRF.IO {
 										entry.NewSizeCompressed = dataTmp.Length;
 										entry.TemporarySizeCompressedAlignment = Methods.Align(entry.NewSizeCompressed);
 
+										if (Compression.IsLzma)
+											entry.Flags |= EntryType.LzmaCompressed;
+										else
+											entry.Flags &= ~EntryType.LzmaCompressed;
+
 										_dataTmp = new byte[entry.TemporarySizeCompressedAlignment];
 										Buffer.BlockCopy(dataTmp, 0, _dataTmp, 0, dataTmp.Length);
 
@@ -147,6 +152,11 @@ namespace GRF.IO {
 
 										entry.NewSizeCompressed = dataTmp.Length;
 										entry.TemporarySizeCompressedAlignment = Methods.Align(entry.NewSizeCompressed);
+
+										if (Compression.IsLzma)
+											entry.Flags |= EntryType.LzmaCompressed;
+										else
+											entry.Flags &= ~EntryType.LzmaCompressed;
 									}
 
 									_dataTmp = new byte[entry.TemporarySizeCompressedAlignment];

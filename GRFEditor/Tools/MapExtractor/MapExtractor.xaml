@@ -17,15 +17,24 @@
             <ColumnDefinition Width="2" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <WPF:TkView MultiSelection="True" Foreground="{StaticResource TextForeground}" Name="_treeViewMapExtractor" Grid.Column="0" BorderThickness="0" PreviewMouseRightButtonUp="_treeViewMapExtractor_PreviewMouseRightButtonUp">
-            <WPF:TkView.ContextMenu>
-                <ContextMenu>
-					<MenuItem Name="_menuItemsSelectRootFiles" TokeiLibrary:WpfProperties.ImagePath="empty.png" Header="Select root files" />
-					<MenuItem Name="_menuItemsSelectInExplorer" TokeiLibrary:WpfProperties.ImagePath="open.png" Header="Select in explorer" Click="_menuItemsSelectInExplorer_Click" />
-					<MenuItem Name="_menuItemsSelectInGrf" TokeiLibrary:WpfProperties.ImagePath="arrowdown.png" Header="Select in project" Click="_menuItemsSelectInGrf_Click" />
-				</ContextMenu>
-            </WPF:TkView.ContextMenu>
-        </WPF:TkView>
+        <Grid Grid.Column="0">
+            <WPF:TkView MultiSelection="True" Foreground="{StaticResource TextForeground}" Name="_treeViewMapExtractor" BorderThickness="0" PreviewMouseRightButtonUp="_treeViewMapExtractor_PreviewMouseRightButtonUp">
+                <WPF:TkView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Name="_menuItemsSelectRootFiles" TokeiLibrary:WpfProperties.ImagePath="empty.png" Header="Select root files" />
+                        <MenuItem Name="_menuItemsSelectInExplorer" TokeiLibrary:WpfProperties.ImagePath="open.png" Header="Select in explorer" Click="_menuItemsSelectInExplorer_Click" />
+                        <MenuItem Name="_menuItemsSelectInGrf" TokeiLibrary:WpfProperties.ImagePath="arrowdown.png" Header="Select in project" Click="_menuItemsSelectInGrf_Click" />
+                    </ContextMenu>
+                </WPF:TkView.ContextMenu>
+            </WPF:TkView>
+            <Border Name="_bulkModeOverlay" Visibility="Collapsed" Background="{StaticResource TabItemBackground}" Padding="12">
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Name="_bulkModeTitle" FontWeight="Bold" FontSize="14" Margin="0 0 0 8" TextWrapping="Wrap" />
+                    <TextBlock TextWrapping="Wrap" Opacity="0.85"
+                               Text="A árvore de recursos não é carregada para muitos mapas (modo rápido). Use Export ou Export to... para extrair todos os recursos imediatamente." />
+                </StackPanel>
+            </Border>
+        </Grid>
         <GridSplitter Width="2" Grid.Column="1" HorizontalAlignment="Left" Background="{x:Static TokeiLibrary:Configuration.UIGridBackground}" />
         <Grid Grid.Column="2" MinWidth="200">
             <Grid.RowDefinitions>

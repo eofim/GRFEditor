@@ -74,6 +74,7 @@ namespace GRFEditor {
 			Settings.LockFiles = Configuration.LockFiles;
 			Settings.AddHashFileForThor = Configuration.AddHashFileForThor;
 			Settings.FullFileTableEncryptionSupport = Configuration.FullFileTableEncryptionSupport;
+			Settings.CompressionLevel = Configuration.CompressionLevel;
 			TemporaryFilesManager.ClearTemporaryFiles();
 			return encoding;
 		}
