@@ -14,6 +14,7 @@ using GRF;
 using GRF.Core;
 using GRF.GrfSystem;
 using GRFEditor.ApplicationConfiguration;
+using GRFEditor.Tools.CustomAccessory;
 using TokeiLibrary;
 using TokeiLibrary.WPF;
 using TokeiLibrary.WPF.Styles;
@@ -41,8 +42,34 @@ namespace GRFEditor.WPF {
 			UIPanelPreviewBackgroundPick(_qcsBackground);
 
 			_initializeGeneralSettings();
+			_initializeCustomAccessorySettings();
 			_initializeApplicationSettings();
 			_initializeResourcesSettings();
+		}
+
+		private void _initializeCustomAccessorySettings() {
+			Binder.Bind(_checkBoxCustomAccessoryPromptOnSave, () => GrfEditorConfiguration.CustomAccessoryPromptOnSave);
+			Binder.Bind(_checkBoxCustomAccessoryAlsoWriteToDisk, () => GrfEditorConfiguration.CustomAccessoryAlsoWriteToDisk);
+
+			if (GrfEditorConfiguration.CustomAccessoryDetectionMode == CustomAccessoryNewSpriteDetectionMode.MissingFromLua)
+				_radioCustomAccessoryDetectMissingFromLua.IsChecked = true;
+			else
+				_radioCustomAccessoryDetectAddedSinceSnapshot.IsChecked = true;
+
+			_radioCustomAccessoryDetectMissingFromLua.Checked += (s, e) => {
+				if (_radioCustomAccessoryDetectMissingFromLua.IsChecked == true)
+					GrfEditorConfiguration.CustomAccessoryDetectionMode = CustomAccessoryNewSpriteDetectionMode.MissingFromLua;
+			};
+			_radioCustomAccessoryDetectAddedSinceSnapshot.Checked += (s, e) => {
+				if (_radioCustomAccessoryDetectAddedSinceSnapshot.IsChecked == true)
+					GrfEditorConfiguration.CustomAccessoryDetectionMode = CustomAccessoryNewSpriteDetectionMode.AddedSinceSnapshot;
+			};
+			Binder.Bind(_textBoxCustomAccessorySpriteFolder, () => GrfEditorConfiguration.CustomAccessorySpriteFolder);
+			Binder.Bind(_textBoxCustomAccessoryIdLub, () => GrfEditorConfiguration.CustomAccessoryIdLubPath);
+			Binder.Bind(_textBoxCustomAccessoryAccnameLub, () => GrfEditorConfiguration.CustomAccessoryAccnameLubPath);
+			Binder.Bind(_checkBoxCustomAccessoryUseOpenAi, () => GrfEditorConfiguration.CustomAccessoryUseOpenAi);
+			Binder.Bind(_textBoxCustomAccessoryOpenAiKey, () => GrfEditorConfiguration.CustomAccessoryOpenAiApiKey);
+			Binder.Bind(_textBoxCustomAccessoryOpenAiModel, () => GrfEditorConfiguration.CustomAccessoryOpenAiModel);
 		}
 
 		private void _initializeGeneralSettings() {

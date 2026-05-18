@@ -267,6 +267,20 @@
     <Compile Include="Tools\MapExtractor\MapExtractorDialog.xaml.cs">
       <DependentUpon>MapExtractorDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tools\CustomAccessory\CustomAccessoryEntry.cs" />
+    <Compile Include="Tools\CustomAccessory\CustomAccessoryLuaService.cs" />
+    <Compile Include="Tools\CustomAccessory\CustomAccessoryLuaTables.cs" />
+    <Compile Include="Tools\CustomAccessory\CustomAccessoryLuaWriter.cs" />
+    <Compile Include="Tools\CustomAccessory\CustomAccessoryLubLocations.cs" />
+    <Compile Include="Tools\CustomAccessory\CustomAccessoryNaming.cs" />
+    <Compile Include="Tools\CustomAccessory\CustomAccessoryNewSpriteDetectionMode.cs" />
+    <Compile Include="Tools\CustomAccessory\CustomAccessoryPaths.cs" />
+    <Compile Include="Tools\CustomAccessory\CustomAccessorySpritePaths.cs" />
+    <Compile Include="Tools\CustomAccessory\OpenAiAccessoryGenerator.cs" />
+    <Compile Include="Tools\CustomAccessory\CustomAccessoryPostSaveHelper.cs" />
+    <Compile Include="Tools\CustomAccessory\CustomAccessoryWizardDialog.xaml.cs">
+      <DependentUpon>CustomAccessoryWizardDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WPF\LeftComboBox.cs" />
     <Compile Include="WPF\MergeDialog.xaml.cs">
       <DependentUpon>MergeDialog.xaml</DependentUpon>
@@ -511,6 +525,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Tools\MapExtractor\MapExtractorDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tools\CustomAccessory\CustomAccessoryWizardDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

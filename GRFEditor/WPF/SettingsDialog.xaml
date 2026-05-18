@@ -133,6 +133,34 @@
 						</StackPanel>
 					</StackPanel>
 				</TabItem>
+				<TabItem Header="Custom accessories" Style="{DynamicResource ResourceKey=TabItemStyled}" Foreground="{DynamicResource TextForeground}">
+					<StackPanel>
+						<StackPanel>
+							<Label Content="{Binding Path=Header, RelativeSource={RelativeSource AncestorType={x:Type TabItem}}}" FontWeight="Bold" FontSize="16" Margin="3 10 0 5" />
+							<Rectangle Margin="5 0 5 5" Stroke="{DynamicResource SeperatorBrush}" VerticalAlignment="Stretch" />
+						</StackPanel>
+						<CheckBox Name="_checkBoxCustomAccessoryPromptOnSave" Content="Perguntar ao salvar o GRF se há sprites novos para atualizar os Lua" Margin="3"/>
+						<Label Content="Detectar sprites novos por:" Margin="3 10 3 4"/>
+						<RadioButton Name="_radioCustomAccessoryDetectMissingFromLua" GroupName="CustomAccessoryDetection" Content="Nome da sprite ausente nos Lua (accessoryid.lub)" Margin="12 0 3 2"/>
+						<RadioButton Name="_radioCustomAccessoryDetectAddedSinceSnapshot" GroupName="CustomAccessoryDetection" Content="Arquivo .spr adicionado ao GRF desde a abertura (antes de salvar conta)" Margin="12 0 3 6"/>
+						<CheckBox Name="_checkBoxCustomAccessoryAlsoWriteToDisk" Content="Também gravar cópia em disco (accessoryid.lub / accname.lub fora do GRF)" Margin="3 6 3 0"/>
+						<TextBlock Text="Por padrão os Lua são lidos e gravados no GRF aberto. Ative a opção acima para espelhar em pasta do cliente ou do repositório." TextWrapping="Wrap" Margin="3 0 8 6" Opacity="0.85" FontSize="11"/>
+						<Label Content="Pasta(s) de sprites no GRF (separar com ; para várias)" Margin="3 8 3 2"/>
+						<TextBox Name="_textBoxCustomAccessorySpriteFolder" Margin="3 0 8 3"/>
+						<TextBlock Text="Padrão: data\sprite\¾Ç¼¼»ç¸®\¿© (acessórios femininos). Use ; para incluir também \³² (masculino)." TextWrapping="Wrap" Margin="3 0 8 6" Opacity="0.85" FontSize="11"/>
+						<Label Content="Caminho do accessoryid.lub em disco (só com cópia em disco ativa; vazio = busca automática)" Margin="3 0 3 2"/>
+						<TextBox Name="_textBoxCustomAccessoryIdLub" Margin="3 0 8 3"/>
+						<Label Content="Caminho do accname.lub em disco (só com cópia em disco ativa; vazio = busca automática)" Margin="3 0 3 2"/>
+						<TextBox Name="_textBoxCustomAccessoryAccnameLub" Margin="3 0 12 3"/>
+						<Rectangle Margin="5 0 5 8" Stroke="{DynamicResource SeperatorBrush}" VerticalAlignment="Stretch" />
+						<TextBlock Text="OpenAI (opcional) sugere constante, viewId e nome de exibição." TextWrapping="Wrap" Margin="3 0 8 3"/>
+						<CheckBox Name="_checkBoxCustomAccessoryUseOpenAi" Content="Usar OpenAI no assistente de custom items" Margin="3"/>
+						<Label Content="Chave da API" Margin="3 8 3 2"/>
+						<TextBox Name="_textBoxCustomAccessoryOpenAiKey" Margin="3 0 8 3"/>
+						<Label Content="Modelo (ex.: gpt-4o-mini)" Margin="3 0 3 2"/>
+						<TextBox Name="_textBoxCustomAccessoryOpenAiModel" Margin="3 0 3 3"/>
+					</StackPanel>
+				</TabItem>
 				<TabItem Header="Shell integration" Style="{DynamicResource ResourceKey=TabItemStyled}" Foreground="{DynamicResource TextForeground}">
 					<StackPanel>
 						<StackPanel>

@@ -23,6 +23,7 @@ using GRFEditor.Core.Services;
 using GRFEditor.OpenGL.WPF;
 using GRFEditor.Tools.GrfValidation;
 using GRFEditor.Tools.Map;
+using GRFEditor.Tools.CustomAccessory;
 using GRFEditor.Tools.SpriteEditor;
 using GRFEditor.WPF;
 using GrfToWpfBridge.Application;
@@ -215,11 +216,15 @@ namespace GRFEditor {
 						_recentFilesManager.AddRecentFile(result.NewFileName);
 
 						if (result.RequiresReload) {
+							CustomAccessoryPostSaveHelper.PendingPromptAfterLoad = true;
 							// Both methods reload the GRF, however Load() resets the tree view and other elements
 							if (result.NewFileName.GetExtension() != result.OldFileName.GetExtension())
 								Load(result.NewFileName, _grfHolder.Header.EncryptionKey);
 							else
 								_reloadContainer(result.NewFileName);
+						}
+						else {
+							this.Dispatch(p => CustomAccessoryPostSaveHelper.TryPromptAfterSave(_grfHolder, this));
 						}
 
 						if (mode == GrfEditorSaveMode.HardCompression && result.Success)
@@ -300,6 +305,27 @@ namespace GRFEditor {
 			public string AccMaleSpr { get; set; }
 			public string AccFemaleAct { get; set; }
 			public string AccFemaleSpr { get; set; }
+		}
+
+		private void _menuItemCustomAccessoryLua_Click(object sender, RoutedEventArgs e) {
+			try {
+				if (!_grfHolder.IsOpened) {
+					ErrorHandler.HandleException("Abra um GRF antes de usar o assistente de custom items.");
+					return;
+				}
+
+				var sprites = CustomAccessoryPostSaveHelper.FindCandidateSprites(_grfHolder);
+				if (sprites.Count == 0) {
+					ErrorHandler.HandleException(CustomAccessoryPostSaveHelper.GetEmptyCandidatesMessage());
+					return;
+				}
+
+				var dialog = new CustomAccessoryWizardDialog(_grfHolder, sprites) { Owner = this };
+				WindowProvider.ShowWindow(dialog, this);
+			}
+			catch (Exception err) {
+				ErrorHandler.HandleException(err);
+			}
 		}
 
 		private void _menuItemImportSprite_Click(object sender, RoutedEventArgs e) {

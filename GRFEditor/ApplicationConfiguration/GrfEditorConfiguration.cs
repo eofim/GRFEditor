@@ -1160,6 +1160,64 @@ namespace GRFEditor.ApplicationConfiguration {
 		}
 
 		#endregion
+
+		#region Custom accessory Lua
+
+		public static bool CustomAccessoryPromptOnSave {
+			get { return Boolean.Parse(ConfigAsker["[CustomAccessory - Prompt on save]", true.ToString()]); }
+			set { ConfigAsker["[CustomAccessory - Prompt on save]"] = value.ToString(); }
+		}
+
+		public static bool CustomAccessoryAlsoWriteToDisk {
+			get { return Boolean.Parse(ConfigAsker["[CustomAccessory - Also write to disk]", false.ToString()]); }
+			set { ConfigAsker["[CustomAccessory - Also write to disk]"] = value.ToString(); }
+		}
+
+		public static GRFEditor.Tools.CustomAccessory.CustomAccessoryNewSpriteDetectionMode CustomAccessoryDetectionMode {
+			get {
+				int value;
+				if (!Int32.TryParse(ConfigAsker["[CustomAccessory - Detection mode]", "0"], out value))
+					value = 0;
+
+				if (!Enum.IsDefined(typeof(GRFEditor.Tools.CustomAccessory.CustomAccessoryNewSpriteDetectionMode), value))
+					value = 0;
+
+				return (GRFEditor.Tools.CustomAccessory.CustomAccessoryNewSpriteDetectionMode)value;
+			}
+			set { ConfigAsker["[CustomAccessory - Detection mode]"] = ((int)value).ToString(); }
+		}
+
+		public static string CustomAccessorySpriteFolder {
+			get { return ConfigAsker["[CustomAccessory - Sprite folder]", GRFEditor.Tools.CustomAccessory.CustomAccessorySpritePaths.DefaultFolder]; }
+			set { ConfigAsker["[CustomAccessory - Sprite folder]"] = value ?? GRFEditor.Tools.CustomAccessory.CustomAccessorySpritePaths.DefaultFolder; }
+		}
+
+		public static string CustomAccessoryIdLubPath {
+			get { return ConfigAsker["[CustomAccessory - accessoryid.lub path]", ""]; }
+			set { ConfigAsker["[CustomAccessory - accessoryid.lub path]"] = value ?? ""; }
+		}
+
+		public static string CustomAccessoryAccnameLubPath {
+			get { return ConfigAsker["[CustomAccessory - accname.lub path]", ""]; }
+			set { ConfigAsker["[CustomAccessory - accname.lub path]"] = value ?? ""; }
+		}
+
+		public static bool CustomAccessoryUseOpenAi {
+			get { return Boolean.Parse(ConfigAsker["[CustomAccessory - OpenAI enabled]", false.ToString()]); }
+			set { ConfigAsker["[CustomAccessory - OpenAI enabled]"] = value.ToString(); }
+		}
+
+		public static string CustomAccessoryOpenAiApiKey {
+			get { return ConfigAsker["[CustomAccessory - OpenAI API key]", ""]; }
+			set { ConfigAsker["[CustomAccessory - OpenAI API key]"] = value ?? ""; }
+		}
+
+		public static string CustomAccessoryOpenAiModel {
+			get { return ConfigAsker["[CustomAccessory - OpenAI model]", "gpt-4o-mini"]; }
+			set { ConfigAsker["[CustomAccessory - OpenAI model]"] = value ?? "gpt-4o-mini"; }
+		}
+
+		#endregion
 	}
 
 	[Flags]

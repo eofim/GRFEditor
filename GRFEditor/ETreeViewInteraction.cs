@@ -17,6 +17,7 @@ using GRF.Threading;
 using GRFEditor.ApplicationConfiguration;
 using GRFEditor.Core;
 using GRFEditor.Core.Services;
+using GRFEditor.Tools.CustomAccessory;
 using GRFEditor.WPF;
 using GRFEditor.WPF.PreviewTabs;
 using GrfToWpfBridge.TreeViewManager;
@@ -793,6 +794,14 @@ namespace GRFEditor {
 
 						_search();
 						_loadListItems();
+
+						CustomAccessoryPostSaveHelper.SnapshotSprites(_grfHolder);
+						bool pendingCustomAccessory = CustomAccessoryPostSaveHelper.PendingPromptAfterLoad;
+						if (pendingCustomAccessory)
+							CustomAccessoryPostSaveHelper.PendingPromptAfterLoad = false;
+						if (pendingCustomAccessory) {
+							this.Dispatch(p => CustomAccessoryPostSaveHelper.TryPromptAfterSave(_grfHolder, this));
+						}
 					}
 				}
 				catch (Exception err) {

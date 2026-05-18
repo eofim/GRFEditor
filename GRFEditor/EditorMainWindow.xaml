@@ -83,6 +83,8 @@
                 <MenuItem Name="_menuItemOpenProgramData" TokeiLibrary:WpfProperties.ImagePath="newFolder.png" Click="_menuItemOpenProgramData_Click" Header="Open roaming data" />
                 <Separator />
                 <MenuItem Name="_menuItemImportSprite" TokeiLibrary:WpfProperties.ImagePath="convert.png" Header="Import sprite..." Click="_menuItemImportSprite_Click" />
+                <MenuItem Name="_menuItemCustomAccessoryLua" TokeiLibrary:WpfProperties.ImagePath="convert.png" Header="Custom accessory Lua..." Click="_menuItemCustomAccessoryLua_Click"
+                          ToolTip="Gera ou atualiza accessoryid.lub e accname.lub a partir de sprites no GRF (com OpenAI opcional)." />
                 <Separator />
                 <MenuItem Name="_menuItemSpriteConverter" TokeiLibrary:WpfProperties.ImagePath="spritemaker.png" Header="Sprite editor" Click="_menuItemSpriteConverter_Click" />
                 <MenuItem Name="_menuItemFlatMapsMaker" TokeiLibrary:WpfProperties.ImagePath="mapEditor.png" Header="Flat maps maker" Click="_menuItemFlatMapsMaker_Click" />

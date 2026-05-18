@@ -1,0 +1,40 @@
+<Styles:TkWindow x:Class="GRFEditor.Tools.CustomAccessory.CustomAccessoryWizardDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Styles="clr-namespace:TokeiLibrary.WPF.Styles;assembly=TokeiLibrary"
+        xmlns:TokeiLibrary="clr-namespace:TokeiLibrary;assembly=TokeiLibrary"
+        Title="Custom accessory Lua" Height="520" Width="900"
+        Background="{StaticResource TabItemBackground}" Foreground="{StaticResource TextForeground}">
+    <Grid Margin="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <TextBlock TextWrapping="Wrap" Margin="0,0,0,8"
+                   Text="Edite constante ACCESSORY_*, viewId e nome exibido (accname). Marque os itens a gravar em accessoryid.lub e accname.lub."/>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,8">
+            <Button Name="_buttonSuggestOpenAi" Content="Sugerir selecionados (OpenAI)" Width="220" Height="26" Margin="0,0,8,0" Click="_buttonSuggestOpenAi_Click"/>
+            <Button Name="_buttonAutoViewIds" Content="Atribuir viewIds sequenciais" Width="180" Height="26" Margin="0,0,8,0" Click="_buttonAutoViewIds_Click"/>
+            <TextBlock Name="_textStatus" VerticalAlignment="Center" Opacity="0.85"/>
+        </StackPanel>
+        <DataGrid Grid.Row="2" Name="_gridEntries" AutoGenerateColumns="False" CanUserAddRows="False"
+                  HeadersVisibility="Column" SelectionMode="Extended" Margin="0,0,0,8">
+            <DataGrid.Columns>
+                <DataGridCheckBoxColumn Header="✓" Binding="{Binding Selected, UpdateSourceTrigger=PropertyChanged}" Width="40"/>
+                <DataGridTextColumn Header="Sprite" Binding="{Binding SpritePath}" Width="220" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Constante" Binding="{Binding ConstantName, UpdateSourceTrigger=PropertyChanged}" Width="240"/>
+                <DataGridTextColumn Header="ViewId" Binding="{Binding ViewId, UpdateSourceTrigger=PropertyChanged}" Width="70"/>
+                <DataGridTextColumn Header="Nome (accname)" Binding="{Binding DisplayName, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
+                <DataGridCheckBoxColumn Header="Novo" Binding="{Binding IsNew}" Width="50" IsReadOnly="True"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Grid Grid.Row="3" TokeiLibrary:WpfProperties.IsDraggable="True" Height="40" Background="{DynamicResource UIDialogBackground}">
+            <DockPanel HorizontalAlignment="Right">
+                <Button Name="_buttonSave" Content="Gravar arquivos Lua" Width="140" Height="26" Margin="3" Click="_buttonSave_Click"/>
+                <Button Content="Cancelar" Width="100" Height="26" Margin="3" Click="_buttonCancel_Click"/>
+            </DockPanel>
+        </Grid>
+    </Grid>
+</Styles:TkWindow>
