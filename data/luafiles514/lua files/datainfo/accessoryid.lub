@@ -2665,7 +2665,6 @@ ACCESSORY_IDs = {
 	ACCESSORY_C_Doughkun = 2677,
 	ACCESSORY_C_Eye_Mask_2 = 2678,
 	ACCESSORY_C_Muka_Sombrero = 2679,
-	ACCESSORY_C_Capybara = 2680,
 	ACCESSORY_C_CLB_HM_Uzagi = 2681,
 	ACCESSORY_C_CB_Fullb_Twintails = 2682,
 	ACCESSORY_C_CB_Fullb_Twosideup = 2683,
@@ -3775,4 +3774,6 @@ ACCESSORY_IDs = {
 	ACCESSORY_c_fire_giant_green = 7823, -- baixo
 	ACCESSORY_c_fire_giant_blue = 7824, -- baixo
 	ACCESSORY_c_fire_giant_black = 7825, -- baixo
+	ACCESSORY_c_capybara = 7826,
+	ACCESSORY_luffy_haki_aura = 7827,
 }

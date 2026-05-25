@@ -15,9 +15,12 @@
         <TextBlock TextWrapping="Wrap" Margin="0,0,0,8"
                    Text="Edite constante ACCESSORY_*, viewId e nome exibido (accname). Marque os itens a gravar em accessoryid.lub e accname.lub."/>
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,8">
+            <TextBlock Text="ID inicial:" VerticalAlignment="Center" Margin="0,0,4,0"/>
+            <TextBox Name="_textInitialViewId" Width="72" Height="22" VerticalAlignment="Center" Margin="0,0,12,0"
+                     ToolTip="Vazio = maior ID em accessoryid.lub + 1. Inteiro positivo para forçar o primeiro viewId de itens novos."/>
             <Button Name="_buttonSuggestOpenAi" Content="Sugerir selecionados (OpenAI)" Width="220" Height="26" Margin="0,0,8,0" Click="_buttonSuggestOpenAi_Click"/>
             <Button Name="_buttonAutoViewIds" Content="Atribuir viewIds sequenciais" Width="180" Height="26" Margin="0,0,8,0" Click="_buttonAutoViewIds_Click"/>
-            <TextBlock Name="_textStatus" VerticalAlignment="Center" Opacity="0.85"/>
+            <TextBlock Name="_textStatus" VerticalAlignment="Center" Opacity="0.85" TextWrapping="Wrap"/>
         </StackPanel>
         <DataGrid Grid.Row="2" Name="_gridEntries" AutoGenerateColumns="False" CanUserAddRows="False"
                   HeadersVisibility="Column" SelectionMode="Extended" Margin="0,0,0,8">
@@ -27,11 +30,12 @@
                 <DataGridTextColumn Header="Constante" Binding="{Binding ConstantName, UpdateSourceTrigger=PropertyChanged}" Width="240"/>
                 <DataGridTextColumn Header="ViewId" Binding="{Binding ViewId, UpdateSourceTrigger=PropertyChanged}" Width="70"/>
                 <DataGridTextColumn Header="Nome (accname)" Binding="{Binding DisplayName, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
-                <DataGridCheckBoxColumn Header="Novo" Binding="{Binding IsNew}" Width="50" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Status" Binding="{Binding StatusDisplay}" Width="170" IsReadOnly="True"/>
             </DataGrid.Columns>
         </DataGrid>
         <Grid Grid.Row="3" TokeiLibrary:WpfProperties.IsDraggable="True" Height="40" Background="{DynamicResource UIDialogBackground}">
             <DockPanel HorizontalAlignment="Right">
+                <Button Name="_buttonGenerateItemInfo" Content="Gerar iteminfo" Width="120" Height="26" Margin="3" Click="_buttonGenerateItemInfo_Click"/>
                 <Button Name="_buttonSave" Content="Gravar arquivos Lua" Width="140" Height="26" Margin="3" Click="_buttonSave_Click"/>
                 <Button Content="Cancelar" Width="100" Height="26" Margin="3" Click="_buttonCancel_Click"/>
             </DockPanel>

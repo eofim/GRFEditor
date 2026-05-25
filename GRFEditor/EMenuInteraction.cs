@@ -173,6 +173,11 @@ namespace GRFEditor {
 						break;
 				}
 
+				if (_grfHolder.IsOpened) {
+					if (CustomAccessorySaveHelper.TryPromptBeforeSave(_grfHolder, this) == CustomAccessoryBeforeSaveAction.CancelSave)
+						return;
+				}
+
 				ContainerSaveResult result = null;
 
 				_asyncOperation.ProgressBar.Progress = 0;
@@ -216,15 +221,11 @@ namespace GRFEditor {
 						_recentFilesManager.AddRecentFile(result.NewFileName);
 
 						if (result.RequiresReload) {
-							CustomAccessoryPostSaveHelper.PendingPromptAfterLoad = true;
 							// Both methods reload the GRF, however Load() resets the tree view and other elements
 							if (result.NewFileName.GetExtension() != result.OldFileName.GetExtension())
 								Load(result.NewFileName, _grfHolder.Header.EncryptionKey);
 							else
 								_reloadContainer(result.NewFileName);
-						}
-						else {
-							this.Dispatch(p => CustomAccessoryPostSaveHelper.TryPromptAfterSave(_grfHolder, this));
 						}
 
 						if (mode == GrfEditorSaveMode.HardCompression && result.Success)
@@ -314,9 +315,9 @@ namespace GRFEditor {
 					return;
 				}
 
-				var sprites = CustomAccessoryPostSaveHelper.FindCandidateSprites(_grfHolder);
+				var sprites = CustomAccessorySaveHelper.FindCandidateSprites(_grfHolder);
 				if (sprites.Count == 0) {
-					ErrorHandler.HandleException(CustomAccessoryPostSaveHelper.GetEmptyCandidatesMessage());
+					ErrorHandler.HandleException(CustomAccessorySaveHelper.GetEmptyCandidatesMessage());
 					return;
 				}
 

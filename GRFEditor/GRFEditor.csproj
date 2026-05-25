@@ -268,16 +268,23 @@
       <DependentUpon>MapExtractorDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tools\CustomAccessory\CustomAccessoryEntry.cs" />
+    <Compile Include="Tools\CustomAccessory\CustomAccessoryEntryStatus.cs" />
     <Compile Include="Tools\CustomAccessory\CustomAccessoryLuaService.cs" />
     <Compile Include="Tools\CustomAccessory\CustomAccessoryLuaTables.cs" />
     <Compile Include="Tools\CustomAccessory\CustomAccessoryLuaWriter.cs" />
+    <Compile Include="Tools\CustomAccessory\CustomAccessoryLuaPatterns.cs" />
     <Compile Include="Tools\CustomAccessory\CustomAccessoryLubLocations.cs" />
     <Compile Include="Tools\CustomAccessory\CustomAccessoryNaming.cs" />
     <Compile Include="Tools\CustomAccessory\CustomAccessoryNewSpriteDetectionMode.cs" />
     <Compile Include="Tools\CustomAccessory\CustomAccessoryPaths.cs" />
     <Compile Include="Tools\CustomAccessory\CustomAccessorySpritePaths.cs" />
     <Compile Include="Tools\CustomAccessory\OpenAiAccessoryGenerator.cs" />
-    <Compile Include="Tools\CustomAccessory\CustomAccessoryPostSaveHelper.cs" />
+    <Compile Include="Tools\CustomAccessory\CustomAccessorySaveHelper.cs" />
+    <Compile Include="Tools\CustomAccessory\CustomAccessoryItemInfoNaming.cs" />
+    <Compile Include="Tools\CustomAccessory\CustomAccessoryItemInfoGenerator.cs" />
+    <Compile Include="Tools\CustomAccessory\CustomAccessoryItemInfoDialog.xaml.cs">
+      <DependentUpon>CustomAccessoryItemInfoDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Tools\CustomAccessory\CustomAccessoryWizardDialog.xaml.cs">
       <DependentUpon>CustomAccessoryWizardDialog.xaml</DependentUpon>
     </Compile>
@@ -527,6 +534,10 @@
     <Page Include="Tools\MapExtractor\MapExtractorDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tools\CustomAccessory\CustomAccessoryItemInfoDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Tools\CustomAccessory\CustomAccessoryWizardDialog.xaml">
       <SubType>Designer</SubType>

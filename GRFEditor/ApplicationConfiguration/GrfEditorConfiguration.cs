@@ -1202,6 +1202,11 @@ namespace GRFEditor.ApplicationConfiguration {
 			set { ConfigAsker["[CustomAccessory - accname.lub path]"] = value ?? ""; }
 		}
 
+		public static string CustomAccessoryItemInfoOutputPath {
+			get { return ConfigAsker["[CustomAccessory - iteminfo output path]", ""]; }
+			set { ConfigAsker["[CustomAccessory - iteminfo output path]"] = value ?? ""; }
+		}
+
 		public static bool CustomAccessoryUseOpenAi {
 			get { return Boolean.Parse(ConfigAsker["[CustomAccessory - OpenAI enabled]", false.ToString()]); }
 			set { ConfigAsker["[CustomAccessory - OpenAI enabled]"] = value.ToString(); }

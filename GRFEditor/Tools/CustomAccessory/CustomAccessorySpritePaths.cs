@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using GRFEditor.ApplicationConfiguration;
 
@@ -67,6 +68,52 @@ namespace GRFEditor.Tools.CustomAccessory {
 			}
 
 			return false;
+		}
+
+		public static bool HasRoSpriteFilePrefix(string fileName) {
+			if (string.IsNullOrEmpty(fileName))
+				return false;
+
+			return fileName.StartsWith(FemaleSpriteFilePrefix, StringComparison.Ordinal)
+				|| fileName.StartsWith(MaleSpriteFilePrefix, StringComparison.Ordinal);
+		}
+
+		/// <summary>
+		/// Ignora .spr/.act sem prefixo ¿©_/³²_ quando já existir o mesmo item com prefixo na mesma pasta.
+		/// Ex.: c_capybara.spr é omitido se ¿©_C_Capybara.spr estiver na mesma pasta.
+		/// </summary>
+		public static List<string> FilterDuplicateUnprefixedSprites(IEnumerable<string> spritePaths) {
+			var list = spritePaths.ToList();
+			if (list.Count == 0)
+				return list;
+
+			var prefixedKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+			foreach (var path in list) {
+				var fileName = Path.GetFileName(path.Replace('/', '\\'));
+				if (!HasRoSpriteFilePrefix(fileName))
+					continue;
+
+				prefixedKeys.Add(BuildSpriteDuplicateKey(path));
+			}
+
+			if (prefixedKeys.Count == 0)
+				return list;
+
+			return list.Where(path => {
+				var fileName = Path.GetFileName(path.Replace('/', '\\'));
+				if (HasRoSpriteFilePrefix(fileName))
+					return true;
+
+				return !prefixedKeys.Contains(BuildSpriteDuplicateKey(path));
+			}).ToList();
+		}
+
+		private static string BuildSpriteDuplicateKey(string grfPath) {
+			var normalized = NormalizeGrfPath(grfPath);
+			var lastSlash = normalized.LastIndexOf('/');
+			var directory = lastSlash >= 0 ? normalized.Substring(0, lastSlash + 1) : "";
+			var constant = CustomAccessoryNaming.FromSpritePath(grfPath);
+			return directory + constant;
 		}
 	}
 }

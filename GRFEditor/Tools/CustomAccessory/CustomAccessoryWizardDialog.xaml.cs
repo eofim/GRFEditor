@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Windows;
 using GRF.Core;
+using TokeiLibrary.WPF;
 using TokeiLibrary.WPF.Styles;
 
 namespace GRFEditor.Tools.CustomAccessory {
@@ -28,7 +29,10 @@ namespace GRFEditor.Tools.CustomAccessory {
 				? spritePaths
 				: CustomAccessoryLuaService.FindSpritePathsInGrf(grf);
 
-			foreach (var entry in CustomAccessoryLuaService.BuildEntriesFromSprites(paths, _tables))
+			int? startViewId;
+			TryGetInitialViewId(out startViewId);
+
+			foreach (var entry in CustomAccessoryLuaService.BuildEntriesFromSprites(paths, _tables, startViewId))
 				_entries.Add(entry);
 
 			_gridEntries.ItemsSource = _entries;
@@ -38,17 +42,56 @@ namespace GRFEditor.Tools.CustomAccessory {
 				MessageBox.Show(this, _lubLocations.GetMissingFilesMessage(), "Arquivos Lua", MessageBoxButton.OK, MessageBoxImage.Warning);
 			}
 			else {
-				_textStatus.Text = _entries.Count + " item(ns) carregado(s). " + _lubLocations.GetSourceDescription();
+				UpdateStatusText(_entries.Count + " item(ns) carregado(s). " + _lubLocations.GetSourceDescription());
 			}
 		}
 
+		private void UpdateStatusText(string actionMessage) {
+			var loadInfo = string.IsNullOrWhiteSpace(_tables.LoadStatusMessage)
+				? ""
+				: _tables.LoadStatusMessage + " ";
+
+			_textStatus.Text = loadInfo + actionMessage;
+		}
+
+		private bool TryGetInitialViewId(out int? startViewId, bool showError = false) {
+			startViewId = null;
+			var text = _textInitialViewId != null ? _textInitialViewId.Text.Trim() : "";
+
+			if (string.IsNullOrEmpty(text))
+				return true;
+
+			int parsed;
+			if (!int.TryParse(text, out parsed) || parsed <= 0) {
+				if (showError) {
+					MessageBox.Show(this,
+						"ID inicial deve ser um inteiro positivo.",
+						"ID inicial",
+						MessageBoxButton.OK,
+						MessageBoxImage.Warning);
+				}
+
+				return false;
+			}
+
+			startViewId = parsed;
+			return true;
+		}
+
 		private void _buttonAutoViewIds_Click(object sender, RoutedEventArgs e) {
-			var nextId = _tables.GetNextViewId();
-			foreach (var entry in _entries.Where(p => p.Selected && p.IsNew).OrderBy(p => p.ConstantName)) {
+			int? startViewId;
+			if (!TryGetInitialViewId(out startViewId, true))
+				return;
+
+			var nextId = startViewId ?? _tables.GetNextViewId();
+			foreach (var entry in _entries.Where(p => p.Selected && p.Status == CustomAccessoryEntryStatus.New).OrderBy(p => p.ConstantName)) {
 				entry.ViewId = nextId++;
 			}
 
-			_textStatus.Text = "ViewIds atribuídos para itens novos selecionados.";
+			var baseInfo = startViewId.HasValue
+				? "a partir de " + startViewId.Value
+				: "sequenciais (maxId + 1)";
+			UpdateStatusText("ViewIds atribuídos para itens novos selecionados " + baseInfo + ".");
 		}
 
 		private void _buttonSuggestOpenAi_Click(object sender, RoutedEventArgs e) {
@@ -86,12 +129,52 @@ namespace GRFEditor.Tools.CustomAccessory {
 			worker.RunWorkerAsync();
 		}
 
+		private bool ConfirmViewIdCollisions(IList<CustomAccessoryEntry> selected) {
+			var warnings = new List<string>();
+			var tables = CustomAccessoryLuaTables.Load(
+				_lubLocations.EditAccessoryIdPath,
+				_lubLocations.EditAccnamePath);
+
+			foreach (var entry in selected) {
+				var existingConstant = tables.FindConstantForViewId(entry.ViewId, entry.ConstantName);
+				if (existingConstant != null) {
+					warnings.Add(entry.ConstantName + " (viewId " + entry.ViewId + ") já usado por " + existingConstant);
+				}
+			}
+
+			foreach (var group in selected.GroupBy(p => p.ViewId).Where(g => g.Count() > 1)) {
+				var names = string.Join(", ", group.Select(p => p.ConstantName));
+				warnings.Add("viewId " + group.Key + " repetido entre: " + names);
+			}
+
+			if (warnings.Count == 0)
+				return true;
+
+			var message = "Há colisão de viewId com IDs já existentes em accessoryid.lub ou entre os itens selecionados:"
+				+ Environment.NewLine + Environment.NewLine
+				+ string.Join(Environment.NewLine, warnings.Take(12))
+				+ (warnings.Count > 12 ? Environment.NewLine + "... e mais " + (warnings.Count - 12) + "." : "")
+				+ Environment.NewLine + Environment.NewLine
+				+ "Deseja gravar mesmo assim?";
+
+			return MessageBox.Show(this, message, "Colisão de viewId",
+				MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes;
+		}
+
 		private void _buttonSave_Click(object sender, RoutedEventArgs e) {
 			var selected = _entries.Where(p => p.Selected).ToList();
 			if (selected.Count == 0) {
 				MessageBox.Show(this, "Nenhum item selecionado.", "Gravar", MessageBoxButton.OK, MessageBoxImage.Information);
 				return;
 			}
+
+			if (!TryGetInitialViewId(out _, true))
+				return;
+
+			CustomAccessoryLuaService.RefreshEntriesFromLuaFiles(selected, _lubLocations);
+
+			if (!ConfirmViewIdCollisions(selected))
+				return;
 
 			foreach (var entry in selected) {
 				if (string.IsNullOrWhiteSpace(entry.ConstantName)) {
@@ -112,10 +195,12 @@ namespace GRFEditor.Tools.CustomAccessory {
 
 			try {
 				CustomAccessoryLuaService.WriteEntries(selected, _lubLocations, _grf);
-				foreach (var entry in selected)
+				foreach (var entry in selected) {
+					entry.Status = CustomAccessoryEntryStatus.Existing;
 					entry.IsNew = false;
+				}
 
-				_textStatus.Text = selected.Count + " item(ns) gravado(s).";
+				UpdateStatusText(selected.Count + " item(ns) gravado(s).");
 				MessageBox.Show(this, _lubLocations.GetSuccessMessage(),
 					"Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
 				DialogResult = true;
@@ -123,6 +208,24 @@ namespace GRFEditor.Tools.CustomAccessory {
 			catch (Exception ex) {
 				MessageBox.Show(this, ex.Message, "Erro ao gravar", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
+		}
+
+		private void _buttonGenerateItemInfo_Click(object sender, RoutedEventArgs e) {
+			var selected = _entries.Where(p => p.Selected).ToList();
+			if (selected.Count == 0) {
+				MessageBox.Show(this, "Selecione ao menos um item.", "Gerar iteminfo", MessageBoxButton.OK, MessageBoxImage.Information);
+				return;
+			}
+
+			foreach (var entry in selected) {
+				if (entry.ViewId <= 0) {
+					MessageBox.Show(this, "Há itens selecionados com ViewId inválido. Atribua viewIds antes de gerar iteminfo.", "Gerar iteminfo", MessageBoxButton.OK, MessageBoxImage.Warning);
+					return;
+				}
+			}
+
+			var dialog = new CustomAccessoryItemInfoDialog(selected) { Owner = this };
+			WindowProvider.ShowWindow(dialog, this);
 		}
 
 		private void _buttonCancel_Click(object sender, RoutedEventArgs e) {

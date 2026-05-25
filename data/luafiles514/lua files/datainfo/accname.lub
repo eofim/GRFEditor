@@ -2668,7 +2668,6 @@ AccNameTable = {
 	[ACCESSORY_IDs.ACCESSORY_C_Doughkun] = "_C_Doughkun",
 	[ACCESSORY_IDs.ACCESSORY_C_Eye_Mask_2] = "_C_Eye_Mask_2",
 	[ACCESSORY_IDs.ACCESSORY_C_Muka_Sombrero] = "_C_Muka_Sombrero",
-	[ACCESSORY_IDs.ACCESSORY_C_Capybara] = "_C_Capybara",
 	[ACCESSORY_IDs.ACCESSORY_C_CLB_HM_Uzagi] = "_C_CLB_HM_Uzagi",
 	[ACCESSORY_IDs.ACCESSORY_C_CB_Fullb_Twintails] = "_C_CB_Fullb_Twintails",
 	[ACCESSORY_IDs.ACCESSORY_C_CB_Fullb_Twosideup] = "_C_CB_Fullb_Twosideup",
@@ -3761,4 +3760,6 @@ AccNameTable = {
 	[ACCESSORY_IDs.ACCESSORY_c_fire_giant_green] = "_c_fire_giant_green",
 	[ACCESSORY_IDs.ACCESSORY_c_fire_giant_blue] = "_c_fire_giant_blue",
 	[ACCESSORY_IDs.ACCESSORY_c_fire_giant_black] = "_c_fire_giant_black",
+	[ACCESSORY_IDs.ACCESSORY_c_capybara] = "_c_capybara",
+	[ACCESSORY_IDs.ACCESSORY_luffy_haki_aura] = "_luffy_haki_aura",
 }

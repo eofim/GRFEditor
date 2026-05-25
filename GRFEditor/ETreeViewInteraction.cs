@@ -795,13 +795,7 @@ namespace GRFEditor {
 						_search();
 						_loadListItems();
 
-						CustomAccessoryPostSaveHelper.SnapshotSprites(_grfHolder);
-						bool pendingCustomAccessory = CustomAccessoryPostSaveHelper.PendingPromptAfterLoad;
-						if (pendingCustomAccessory)
-							CustomAccessoryPostSaveHelper.PendingPromptAfterLoad = false;
-						if (pendingCustomAccessory) {
-							this.Dispatch(p => CustomAccessoryPostSaveHelper.TryPromptAfterSave(_grfHolder, this));
-						}
+						CustomAccessorySaveHelper.SnapshotSprites(_grfHolder);
 					}
 				}
 				catch (Exception err) {
