@@ -175,6 +175,93 @@
     <Compile Include="Core\Services\PreviewService.cs" />
     <Compile Include="Core\Services\PreviewServiceReadAs.cs" />
     <Compile Include="Core\Services\RenamingService.cs" />
+    <Compile Include="Core\ProjectProfiles\ProjectProfile.cs" />
+    <Compile Include="Core\ProjectProfiles\ProjectProfilePaths.cs" />
+    <Compile Include="Core\ProjectProfiles\ProjectProfileJsonSerializer.cs" />
+    <Compile Include="Core\ProjectProfiles\ProjectProfileService.cs" />
+    <Compile Include="Core\ProjectProfiles\ProjectProfilePathValidator.cs" />
+    <Compile Include="Core\ProjectProfiles\ActiveProjectProfile.cs" />
+    <Compile Include="Core\ProjectProfiles\ProjectProfileBuildRuleKeys.cs" />
+    <Compile Include="Core\ProjectProfiles\ProjectProfileBuildContext.cs" />
+    <Compile Include="Core\BuildPipeline\BuildSeverity.cs" />
+    <Compile Include="Core\BuildPipeline\BuildStepResult.cs" />
+    <Compile Include="Core\BuildPipeline\BuildPipelineOptions.cs" />
+    <Compile Include="Core\BuildPipeline\BuildPipelineResult.cs" />
+    <Compile Include="Core\BuildPipeline\BuildPipelineJson.cs" />
+    <Compile Include="Core\BuildPipeline\BuildPipelineArtifacts.cs" />
+    <Compile Include="Core\BuildPipeline\BuildManifestExporter.cs" />
+    <Compile Include="Core\BuildPipeline\ManifestComparisonService.cs" />
+    <Compile Include="Core\BuildPipeline\BuildChangelogExporter.cs" />
+    <Compile Include="Core\BuildPipeline\BuildPipelineFileHashes.cs" />
+    <Compile Include="Core\BuildPipeline\BuildPipelineSha1Hash.cs" />
+    <Compile Include="Core\BuildPipeline\BuildPipelineReportWriter.cs" />
+    <Compile Include="Core\BuildPipeline\BuildPipelineService.cs" />
+    <Compile Include="Core\GrfCompare\GrfCompareStatus.cs" />
+    <Compile Include="Core\GrfCompare\GrfCompareEntry.cs" />
+    <Compile Include="Core\GrfCompare\GrfCompareResult.cs" />
+    <Compile Include="Core\GrfCompare\FileHashService.cs" />
+    <Compile Include="Core\GrfCompare\GrfCompareService.cs" />
+    <Compile Include="Core\GrfCompare\GrfCompareView.cs" />
+    <Compile Include="Core\GrfCompare\GrfCompareExport.cs" />
+    <Compile Include="Core\GrfCompare\GrfCompareFileExportMode.cs" />
+    <Compile Include="Core\GrfCompare\GrfCompareFileExportResult.cs" />
+    <Compile Include="Core\GrfCompare\GrfCompareFileExportService.cs" />
+    <Compile Include="Core\AccessoryScanner\AccessoryScanStatus.cs" />
+    <Compile Include="Core\AccessoryScanner\AccessoryScanEntry.cs" />
+    <Compile Include="Core\AccessoryScanner\AccessoryScanResult.cs" />
+    <Compile Include="Core\AccessoryScanner\AccessoryScannerInput.cs" />
+    <Compile Include="Core\AccessoryScanner\AccessoryLubIndex.cs" />
+    <Compile Include="Core\AccessoryScanner\AccessoryScannerService.cs" />
+    <Compile Include="Core\ItemInfo\ItemInfoEntry.cs" />
+    <Compile Include="Core\ItemInfo\ItemInfoParseResult.cs" />
+    <Compile Include="Core\ItemInfo\ItemInfoValidationOptions.cs" />
+    <Compile Include="Core\ItemInfo\ItemInfoValidationSummary.cs" />
+    <Compile Include="Core\ItemInfo\ItemInfoTextParser.cs" />
+    <Compile Include="Core\ItemInfo\ItemInfoFileReader.cs" />
+    <Compile Include="Core\ItemInfo\ItemInfoService.cs" />
+    <Compile Include="Core\ItemInfo\ItemInfoInsertService.cs" />
+    <Compile Include="Core\ItemInfo\ItemInfoBuilderCsvImporter.cs" />
+    <Compile Include="Core\ItemInfo\ItemInfoCsvImportRow.cs" />
+    <Compile Include="Core\ItemInfo\ItemInfoCsvImportResult.cs" />
+    <Compile Include="Core\ItemInfo\ItemInfoCsvBatchValidator.cs" />
+    <Compile Include="Core\ItemInfo\ItemInfoCsvPreviewDialog.xaml.cs">
+      <DependentUpon>ItemInfoCsvPreviewDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Core\ItemInfo\ItemInfoBuilderExport.cs" />
+    <Compile Include="Core\ItemInfo\ItemInfoBuilderDialog.xaml.cs">
+      <DependentUpon>ItemInfoBuilderDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Core\ItemInfo\ItemInfoDiffDialog.xaml.cs">
+      <DependentUpon>ItemInfoDiffDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Core\GrfCompare\GrfCompareDialog.xaml.cs">
+      <DependentUpon>GrfCompareDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Core\BuildPipeline\BuildPipelineDialog.xaml.cs">
+      <DependentUpon>BuildPipelineDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="EProfileInteraction.cs" />
+    <Compile Include="Core\ProjectProfiles\ProjectProfilesDialog.xaml.cs">
+      <DependentUpon>ProjectProfilesDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Core\RagnarokValidation\RagnarokValidationCategory.cs" />
+    <Compile Include="Core\RagnarokValidation\RagnarokValidationIssue.cs" />
+    <Compile Include="Core\RagnarokValidation\RagnarokValidationResult.cs" />
+    <Compile Include="Core\RagnarokValidation\RagnarokValidationSeverity.cs" />
+    <Compile Include="Core\RagnarokValidation\RagnarokValidationStrings.cs" />
+    <Compile Include="Core\RagnarokValidation\RagnarokAccessoryGrfLocator.cs" />
+    <Compile Include="Core\RagnarokValidation\RagnarokAccessoryLuaParser.cs" />
+    <Compile Include="Core\RagnarokValidation\RagnarokAccessoryValidation.cs" />
+    <Compile Include="Core\RagnarokValidation\RagnarokValidationFixKind.cs" />
+    <Compile Include="Core\RagnarokValidation\RagnarokValidationAutoFixService.cs" />
+    <Compile Include="Core\RagnarokValidation\RagnarokValidationService.cs" />
+    <Compile Include="Core\RagnarokValidation\RagnarokValidationView.cs" />
+    <Compile Include="Core\RagnarokValidation\RagnarokValidationExport.cs" />
+    <Compile Include="Core\RagnarokValidation\RagnarokValidationIgnoredRules.cs" />
+    <Compile Include="Core\RagnarokValidation\RagnarokValidationRuleIds.cs" />
+    <Compile Include="Core\RagnarokValidation\RagnarokValidationDialog.xaml.cs">
+      <DependentUpon>RagnarokValidationDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Tools\SpriteEditor\SpriteEditorConfiguration.cs" />
     <Compile Include="Core\VirtualFileDataObject.cs" />
     <Compile Include="EditorMainWindow.xaml.cs">
@@ -287,6 +374,28 @@
     </Compile>
     <Compile Include="Tools\CustomAccessory\CustomAccessoryWizardDialog.xaml.cs">
       <DependentUpon>CustomAccessoryWizardDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\CustomAccessory\CustomAccessoryManagerEntry.cs" />
+    <Compile Include="Tools\CustomAccessory\CustomAccessoryManagerSaveMode.cs" />
+    <Compile Include="Tools\CustomAccessory\CustomAccessoryManagerSaveValidation.cs" />
+    <Compile Include="Tools\CustomAccessory\CustomAccessoryManagerSaveService.cs" />
+    <Compile Include="Tools\CustomAccessory\CustomAccessoryBatchImportCsvRow.cs" />
+    <Compile Include="Tools\CustomAccessory\CustomAccessoryBatchImportCsvParser.cs" />
+    <Compile Include="Tools\CustomAccessory\CustomAccessoryBatchImportResult.cs" />
+    <Compile Include="Tools\CustomAccessory\CustomAccessoryBatchImportService.cs" />
+    <Compile Include="Tools\CustomAccessory\CustomAccessoryBatchImportReportDialog.xaml.cs">
+      <DependentUpon>CustomAccessoryBatchImportReportDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\CustomAccessory\CustomAccessoryManagerPreview.cs" />
+    <Compile Include="Tools\CustomAccessory\CustomAccessoryManagerExport.cs" />
+    <Compile Include="Tools\CustomAccessory\CustomAccessoryLubPathsDialog.xaml.cs">
+      <DependentUpon>CustomAccessoryLubPathsDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\CustomAccessory\CustomAccessoryManagerDiffDialog.xaml.cs">
+      <DependentUpon>CustomAccessoryManagerDiffDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\CustomAccessory\CustomAccessoryManagerDialog.xaml.cs">
+      <DependentUpon>CustomAccessoryManagerDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="WPF\LeftComboBox.cs" />
     <Compile Include="WPF\MergeDialog.xaml.cs">
@@ -435,6 +544,34 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Core\RagnarokValidation\RagnarokValidationDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Core\ProjectProfiles\ProjectProfilesDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Core\BuildPipeline\BuildPipelineDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Core\ItemInfo\ItemInfoBuilderDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Core\ItemInfo\ItemInfoDiffDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Core\ItemInfo\ItemInfoCsvPreviewDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Core\GrfCompare\GrfCompareDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Tools\Map\CellEditControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -540,6 +677,22 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Tools\CustomAccessory\CustomAccessoryWizardDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tools\CustomAccessory\CustomAccessoryManagerDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tools\CustomAccessory\CustomAccessoryLubPathsDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tools\CustomAccessory\CustomAccessoryManagerDiffDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tools\CustomAccessory\CustomAccessoryBatchImportReportDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -1032,6 +1185,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Numerics" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />

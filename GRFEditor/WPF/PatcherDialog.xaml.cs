@@ -6,6 +6,7 @@ using ErrorManager;
 using GRF.Core;
 using GRF.Threading;
 using GRFEditor.ApplicationConfiguration;
+using GRFEditor.Core.ProjectProfiles;
 using GrfToWpfBridge.Application;
 using TokeiLibrary;
 using TokeiLibrary.WPF;
@@ -28,8 +29,27 @@ namespace GRFEditor.WPF {
 			InitializeComponent();
 			_asyncOperation = new AsyncOperation(_progress);
 			_textBoxOutputName.Text = String.Format("{0:0000}-{1:00}-{2:00}{3}", DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, "data.grf");
+			_applyActiveProfileDefaults();
 
 			WpfUtilities.SetMinAndMaxSize(this);
+		}
+
+		private void _applyActiveProfileDefaults() {
+			if (!ActiveProjectProfile.HasActive)
+				return;
+
+			ActiveProjectProfile.ConfirmContinueWithInvalidPaths(
+				this,
+				"Patch maker",
+				ActiveProjectProfile.GetPathWarningsForTool(p => p.MainGrfPath, p => p.PatchOutputFolderPath));
+
+			string outputName = ProjectProfileBuildContext.GetOutputGrfFileName(_textBoxOutputName.Text);
+			if (!String.IsNullOrEmpty(outputName))
+				_textBoxOutputName.Text = outputName;
+
+			string mainGrf = ActiveProjectProfile.GetMainGrfPath();
+			if (!String.IsNullOrEmpty(mainGrf) && File.Exists(mainGrf) && String.IsNullOrWhiteSpace(_pathBrowserNewGrf.Text))
+				_pathBrowserNewGrf.Text = mainGrf;
 		}
 
 		#region IDisposable Members
@@ -75,7 +95,7 @@ namespace GRFEditor.WPF {
 
 			FileInfo infoOld = new FileInfo(_fileOlder);
 			FileInfo infoNew = new FileInfo(_fileNewer);
-			string fileName = Path.Combine(Methods.ApplicationPath, _textBoxOutputName.Text);
+			string fileName = ProjectProfileBuildContext.CombinePatchOutputPath(_textBoxOutputName.Text);
 
 			MessageBoxResult result = MessageBoxResult.None;
 
@@ -88,12 +108,12 @@ namespace GRFEditor.WPF {
 			}
 
 			if (result == MessageBoxResult.Yes) {
-				GrfThread thread = new GrfThread(() => _newerGrf.Patch(_olderGrf, Path.Combine(GrfEditorConfiguration.ProgramDataPath, Path.GetFileName(fileName))), _olderGrf, fileName);
+				GrfThread thread = new GrfThread(() => _newerGrf.Patch(_olderGrf, fileName), _olderGrf, fileName);
 				thread.Finished += _thread_Finished;
 				_asyncOperation.SetAndRunOperation(thread);
 			}
 			else {
-				GrfThread thread = new GrfThread(() => _olderGrf.Patch(_newerGrf, Path.Combine(GrfEditorConfiguration.ProgramDataPath, Path.GetFileName(fileName))), _newerGrf, fileName);
+				GrfThread thread = new GrfThread(() => _olderGrf.Patch(_newerGrf, fileName), _newerGrf, fileName);
 				thread.Finished += _thread_Finished;
 				_asyncOperation.SetAndRunOperation(thread);
 			}
@@ -101,7 +121,7 @@ namespace GRFEditor.WPF {
 
 		private void _thread_Finished(object state) {
 			try {
-				OpeningService.FileOrFolder(Path.Combine(GrfEditorConfiguration.ProgramDataPath, Path.GetFileName((string) state)));
+				OpeningService.FileOrFolder((string) state);
 			}
 			catch {
 			}

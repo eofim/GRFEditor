@@ -1,0 +1,104 @@
+<Styles:TkWindow x:Class="GRFEditor.Core.GrfCompare.GrfCompareDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Styles="clr-namespace:TokeiLibrary.WPF.Styles;assembly=TokeiLibrary"
+        xmlns:TokeiLibrary="clr-namespace:TokeiLibrary;assembly=TokeiLibrary"
+        xmlns:ListView="clr-namespace:TokeiLibrary.WPF.Styles.ListView;assembly=TokeiLibrary"
+        MinHeight="580" Height="700" Width="1000" MinWidth="900">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Margin="8 8 8 4">
+            <Label Content="Compare GRFs" FontWeight="Bold" FontSize="16" Margin="0 0 0 4" />
+            <TextBlock Name="_textSummary" Text="Select two GRF files and run compare. GRFs are opened read-only and are not modified."
+                       TextWrapping="Wrap" Margin="0 0 0 4" />
+            <Rectangle Height="1" Stroke="{DynamicResource SeperatorBrush}" Margin="0 2 0 0" />
+        </StackPanel>
+        <Grid Grid.Row="1" Margin="8 4 8 4">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Label Content="GRF A (old)" VerticalAlignment="Center" />
+            <Styles:PathBrowser Grid.Column="1" Name="_pbGrfOld" BrowseMode="File"
+                                Filter="Container Files|*.grf;*.gpf;*.thor"
+                                UseSavePath="True" SavePathUniqueName="GRFEditor - Compare old - "
+                                TextChanged="_grfPath_Changed" Margin="3 0 0 3" />
+            <Label Grid.Row="1" Content="GRF B (new)" VerticalAlignment="Center" />
+            <Styles:PathBrowser Grid.Row="1" Grid.Column="1" Name="_pbGrfNew" BrowseMode="File"
+                                Filter="Container Files|*.grf;*.gpf;*.thor"
+                                UseSavePath="True" SavePathUniqueName="GRFEditor - Compare new - "
+                                TextChanged="_grfPath_Changed" Margin="3 0 0 0" />
+        </Grid>
+        <Grid Grid.Row="2" Margin="8 4 8 4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="200" />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Label Content="Status:" VerticalAlignment="Center" Margin="0 0 6 0" />
+            <ComboBox Name="_comboStatus" Grid.Column="1" VerticalAlignment="Center" SelectionChanged="_filters_Changed" />
+            <Label Content="Search path:" Grid.Column="2" VerticalAlignment="Center" Margin="12 0 6 0" />
+            <TextBox Name="_textSearch" Grid.Column="3" VerticalAlignment="Center" Height="24"
+                     VerticalContentAlignment="Center" TextChanged="_textSearch_TextChanged"
+                     ToolTip="Filter by relative path" />
+        </Grid>
+        <ListView Name="_listCompare" Grid.Row="3" Margin="8 0 8 0" BorderThickness="0"
+                  Foreground="{StaticResource TextForeground}"
+                  ListView:ListViewExtensions.IsGridSortable="True"
+                  VirtualizingStackPanel.IsVirtualizing="True"
+                  SelectionMode="Extended"
+                  ScrollViewer.HorizontalScrollBarVisibility="Auto" />
+        <WrapPanel Grid.Row="4" Margin="8 6 8 2" HorizontalAlignment="Left">
+            <Button Name="_buttonExportCsv" Content="Export CSV" Width="100" Height="24" Margin="0 0 6 4"
+                    Click="_buttonExportCsv_Click" IsEnabled="False" />
+            <Button Name="_buttonExportJson" Content="Export JSON" Width="100" Height="24" Margin="0 0 6 4"
+                    Click="_buttonExportJson_Click" IsEnabled="False" />
+            <Button Name="_buttonExportChangedTxt" Content="Export changed TXT" Width="130" Height="24" Margin="0 0 6 4"
+                    Click="_buttonExportChangedTxt_Click" IsEnabled="False"
+                    ToolTip="Lists all entries that are not Same (paths and renames)." />
+        </WrapPanel>
+        <StackPanel Grid.Row="5" Margin="8 0 8 4">
+            <Label Content="Export files (from full compare, preserves folder structure)" FontWeight="SemiBold" Margin="0 0 0 4" />
+            <WrapPanel HorizontalAlignment="Left">
+                <Button Name="_buttonExportAdded" Content="Export added" Width="110" Height="24" Margin="0 0 6 4"
+                        Click="_buttonExportAdded_Click" IsEnabled="False"
+                        ToolTip="Extract added files from GRF B into the selected folder." />
+                <Button Name="_buttonExportModified" Content="Export modified" Width="120" Height="24" Margin="0 0 6 4"
+                        Click="_buttonExportModified_Click" IsEnabled="False"
+                        ToolTip="Extract modified files from GRF B (same path or content change)." />
+                <Button Name="_buttonExportAddedModified" Content="Export added + modified" Width="150" Height="24" Margin="0 0 6 4"
+                        Click="_buttonExportAddedModified_Click" IsEnabled="False" />
+                <Button Name="_buttonExportRemovedList" Content="Export removed list" Width="130" Height="24" Margin="0 0 6 4"
+                        Click="_buttonExportRemovedList_Click" IsEnabled="False"
+                        ToolTip="Writes removed-files.txt (paths only in GRF A)." />
+                <Button Name="_buttonExportFullReport" Content="Export full report" Width="130" Height="24" Margin="0 0 6 4"
+                        Click="_buttonExportFullReport_Click" IsEnabled="False"
+                        ToolTip="Reports (CSV/JSON/TXT), removed list, and changed files under files/." />
+            </WrapPanel>
+        </StackPanel>
+        <Grid Grid.Row="6" TokeiLibrary:WpfProperties.IsDraggable="True" Height="40" Background="{DynamicResource UIDialogBackground}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="320" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Styles:TkProgressBar x:Name="_progressBar" Margin="8 0 0 0" />
+            <DockPanel Grid.Column="1" HorizontalAlignment="Right" Margin="0 0 8 0">
+                <Button Name="_buttonCompare" Content="Compare" Width="100" Height="24" Margin="3" Click="_buttonCompare_Click" />
+                <Button Name="_buttonClose" Content="Close" Width="100" Height="24" Margin="3" Click="_buttonClose_Click" />
+            </DockPanel>
+        </Grid>
+    </Grid>
+</Styles:TkWindow>

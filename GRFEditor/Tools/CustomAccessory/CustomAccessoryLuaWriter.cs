@@ -117,6 +117,53 @@ namespace GRFEditor.Tools.CustomAccessory {
 			}
 		}
 
+		public static string PreviewAccessoryIdContent(string content, IEnumerable<CustomAccessoryEntry> entries) {
+			var result = content ?? "";
+			foreach (var entry in entries.Where(p => p != null && p.ShouldWriteAccessoryId && !string.IsNullOrWhiteSpace(p.ConstantName)))
+				result = UpsertAccessoryIdLine(result, entry.ConstantName, entry.ViewId);
+
+			return result;
+		}
+
+		public static string PreviewAccnameContent(string content, IEnumerable<CustomAccessoryEntry> entries) {
+			var result = content ?? "";
+			foreach (var entry in entries.Where(p => p != null && p.ShouldWriteAccname && !string.IsNullOrWhiteSpace(p.ConstantName)))
+				result = UpsertAccnameLine(result, entry.ConstantName, entry.DisplayName);
+
+			return result;
+		}
+
+		public static string BuildLineDiffPreview(string label, string before, string after) {
+			var beforeLines = SplitLines(before ?? "");
+			var afterLines = SplitLines(after ?? "");
+			var sb = new StringBuilder();
+			sb.AppendLine("=== " + label + " ===");
+
+			int max = Math.Max(beforeLines.Length, afterLines.Length);
+			bool anyChange = false;
+
+			for (int i = 0; i < max; i++) {
+				var oldLine = i < beforeLines.Length ? beforeLines[i] : null;
+				var newLine = i < afterLines.Length ? afterLines[i] : null;
+
+				if (string.Equals(oldLine, newLine, StringComparison.Ordinal))
+					continue;
+
+				anyChange = true;
+
+				if (oldLine != null)
+					sb.AppendLine("- " + oldLine);
+
+				if (newLine != null)
+					sb.AppendLine("+ " + newLine);
+			}
+
+			if (!anyChange)
+				sb.AppendLine("(sem alterações de linha)");
+
+			return sb.ToString();
+		}
+
 		public static void NormalizeEntryNames(CustomAccessoryEntry entry) {
 			if (entry == null)
 				return;

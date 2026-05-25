@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Windows;
 using GRF.Core;
+using GRFEditor.Core.ProjectProfiles;
 using TokeiLibrary.WPF;
 using TokeiLibrary.WPF.Styles;
 
@@ -36,6 +37,15 @@ namespace GRFEditor.Tools.CustomAccessory {
 				_entries.Add(entry);
 
 			_gridEntries.ItemsSource = _entries;
+
+			int? profileViewId = ActiveProjectProfile.GetLastUsedViewId();
+			if (profileViewId.HasValue && _textInitialViewId != null && String.IsNullOrWhiteSpace(_textInitialViewId.Text))
+				_textInitialViewId.Text = profileViewId.Value.ToString();
+
+			ActiveProjectProfile.ConfirmContinueWithInvalidPaths(
+				this,
+				"Custom accessory Lua",
+				ActiveProjectProfile.GetPathWarningsForTool(p => p.AccessoryIdPath, p => p.AccNamePath, p => p.ClientFolderPath));
 
 			if (!_lubLocations.IsValid) {
 				_textStatus.Text = _lubLocations.GetMissingFilesMessage();

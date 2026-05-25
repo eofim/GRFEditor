@@ -1,0 +1,22 @@
+<Styles:TkWindow x:Class="GRFEditor.Tools.CustomAccessory.CustomAccessoryBatchImportReportDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Styles="clr-namespace:TokeiLibrary.WPF.Styles;assembly=TokeiLibrary"
+        Title="Relatório de importação" Height="480" Width="720" MinHeight="360" MinWidth="560">
+    <Grid Margin="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <TextBlock Name="_textSummary" TextWrapping="Wrap" Margin="0,0,0,8"/>
+        <TextBox Grid.Row="1" Name="_textReport" IsReadOnly="True" TextWrapping="NoWrap"
+                 VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                 FontFamily="Consolas" AcceptsReturn="True"/>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
+            <Button Name="_buttonExportPreview" Content="Exportar preview CSV" Width="150" Height="26" Margin="4,0,4,0" Click="_buttonExportPreview_Click"/>
+            <Button Name="_buttonLoad" Content="Carregar na grade" Width="130" Height="26" Margin="4,0,4,0" Click="_buttonLoad_Click" IsDefault="True"/>
+            <Button Content="Fechar" Width="90" Height="26" Margin="4,0,0,0" Click="_buttonClose_Click" IsCancel="True"/>
+        </StackPanel>
+    </Grid>
+</Styles:TkWindow>

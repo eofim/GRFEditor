@@ -21,6 +21,11 @@ using GRF.Threading;
 using GRFEditor.ApplicationConfiguration;
 using GRFEditor.Core.Services;
 using GRFEditor.OpenGL.WPF;
+using GRFEditor.Core.BuildPipeline;
+using GRFEditor.Core.GrfCompare;
+using GRFEditor.Core.ItemInfo;
+using GRFEditor.Core.ProjectProfiles;
+using GRFEditor.Core.RagnarokValidation;
 using GRFEditor.Tools.GrfValidation;
 using GRFEditor.Tools.Map;
 using GRFEditor.Tools.CustomAccessory;
@@ -287,6 +292,52 @@ namespace GRFEditor {
 			WindowProvider.Show(new ValidationDialog(_grfHolder), _menuItemValidateGrf, null);
 		}
 
+		private void _menuItemRagnarokValidation_Click(object sender, RoutedEventArgs e) {
+			try {
+				if (!_grfHolder.IsOpened) {
+					ErrorHandler.HandleException("Open a GRF first.", ErrorLevel.Low);
+					return;
+				}
+
+				WindowProvider.ShowWindow(new RagnarokValidationDialog(_grfHolder), this);
+			}
+			catch (Exception err) {
+				ErrorHandler.HandleException(err);
+			}
+		}
+
+		private void _menuItemProjectProfiles_Click(object sender, RoutedEventArgs e) {
+			try {
+				WindowProvider.ShowWindow(new ProjectProfilesDialog(), this);
+			}
+			catch (Exception err) {
+				ErrorHandler.HandleException(err);
+			}
+		}
+
+		private void _menuItemBuildPipeline_Click(object sender, RoutedEventArgs e) {
+			try {
+				if (!_grfHolder.IsOpened) {
+					ErrorHandler.HandleException("Open a GRF first.", ErrorLevel.Low);
+					return;
+				}
+
+				WindowProvider.ShowWindow(new BuildPipelineDialog(_grfHolder), this);
+			}
+			catch (Exception err) {
+				ErrorHandler.HandleException(err);
+			}
+		}
+
+		private void _menuItemCompareGrfs_Click(object sender, RoutedEventArgs e) {
+			try {
+				WindowProvider.Show(new GrfCompareDialog(), _menuItemCompareGrfs, this);
+			}
+			catch (Exception err) {
+				ErrorHandler.HandleException(err);
+			}
+		}
+
 		private void _menuItemAbout_Click(object sender, RoutedEventArgs e) {
 			var dialog = new AboutDialog(Configuration.PublicVersion, Configuration.RealVersion, Configuration.Author, Configuration.ProgramName);
 			dialog.AboutTextBox.Background = FindResource("UIThemeAboutDialogBrush") as Brush;
@@ -306,6 +357,24 @@ namespace GRFEditor {
 			public string AccMaleSpr { get; set; }
 			public string AccFemaleAct { get; set; }
 			public string AccFemaleSpr { get; set; }
+		}
+
+		private void _menuItemCustomAccessoryManager_Click(object sender, RoutedEventArgs e) {
+			try {
+				WindowProvider.Show(new CustomAccessoryManagerDialog(_grfHolder), _menuItemCustomAccessoryManager, this);
+			}
+			catch (Exception err) {
+				ErrorHandler.HandleException(err);
+			}
+		}
+
+		private void _menuItemItemInfoBuilder_Click(object sender, RoutedEventArgs e) {
+			try {
+				WindowProvider.Show(new ItemInfoBuilderDialog(_grfHolder), _menuItemItemInfoBuilder, this);
+			}
+			catch (Exception err) {
+				ErrorHandler.HandleException(err);
+			}
 		}
 
 		private void _menuItemCustomAccessoryLua_Click(object sender, RoutedEventArgs e) {
@@ -727,6 +796,7 @@ namespace GRFEditor {
 			_miExtract.Click += _menuItemsExtract_Click;
 			_miExtractAt.Click += _menuItemsExtractAt_Click;
 			_miExportMapFiles.Click += _menuItemsExportMapFiles_Click;
+		_miGenerateFlatMaps.Click += _menuItemsGenerateFlatMaps_Click;
 			_miDelete.Click += _menuItemsDelete_Click;
 			_miRename.Click += _menuItemsRename_Click;
 			_miSaveMapAs.Click += _menuItemsSaveMapAs_Click;
@@ -750,6 +820,7 @@ namespace GRFEditor {
 			_contextMenuEntries.Items.Add(_miExtractAt);
 			_contextMenuEntries.Items.Add(_miExportAsThor);
 			_contextMenuEntries.Items.Add(_miExportMapFiles);
+		_contextMenuEntries.Items.Add(_miGenerateFlatMaps);
 			_contextMenuEntries.Items.Add(_miSaveMapAs);
 			_contextMenuEntries.Items.Add(_miConvertRsw_Anim);
 			_contextMenuEntries.Items.Add(_miConvertRsw_AnimTo);
@@ -821,6 +892,7 @@ namespace GRFEditor {
 		private readonly MenuItem _miEncrypt = new MenuItem { Header = "Encrypt", IsEnabled = true, Icon = new Image { Source = ApplicationManager.PreloadResourceImage("empty.png") } };
 		private readonly MenuItem _miEncryption = new MenuItem { Header = "Encryption", Icon = new Image { Source = ApplicationManager.PreloadResourceImage("lock.png") } };
 		private readonly MenuItem _miExportMapFiles = new MenuItem { Header = "Export map files...", Icon = new Image { Source = ApplicationManager.PreloadResourceImage("mapEditor.png") } };
+	private readonly MenuItem _miGenerateFlatMaps = new MenuItem { Header = "Generate flat maps...", Icon = new Image { Source = ApplicationManager.PreloadResourceImage("mapEditor.png") } };
 		private readonly MenuItem _miExtract = new MenuItem { Header = "Extract", Icon = new Image { Source = ApplicationManager.PreloadResourceImage("archive.png") } };
 		private readonly MenuItem _miExtractAt = new MenuItem { Header = "Extract...", Icon = new Image { Source = ApplicationManager.PreloadResourceImage("archive.png") } };
 		private readonly MenuItem _miExportAsThor = new MenuItem { Header = "Export selection...", Icon = new Image { Source = new GrfImage(ApplicationManager.GetResource("grf-16.png")).Cast<BitmapSource>() } };

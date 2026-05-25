@@ -1,0 +1,105 @@
+<Styles:TkWindow x:Class="GRFEditor.Core.BuildPipeline.BuildPipelineDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Styles="clr-namespace:TokeiLibrary.WPF.Styles;assembly=TokeiLibrary"
+        xmlns:TokeiLibrary="clr-namespace:TokeiLibrary;assembly=TokeiLibrary"
+        MinHeight="560" Height="640" Width="880" MinWidth="760">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="150" />
+            <RowDefinition />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Margin="8 8 8 4">
+            <Label Content="Build pipeline" FontWeight="Bold" FontSize="16" Margin="0 0 0 4" />
+            <TextBlock Name="_textSummary" Text="Prepare options and run the pipeline. The GRF is not saved automatically."
+                       TextWrapping="Wrap" Margin="0 0 0 4" />
+            <Rectangle Height="1" Stroke="{DynamicResource SeperatorBrush}" Margin="0 2 0 0" />
+        </StackPanel>
+        <Grid Grid.Row="1" Margin="8 4 8 4">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0 0 0 6">
+                <Label Content="Profile source:" VerticalAlignment="Center" Margin="0 0 8 0" />
+                <RadioButton Name="_radioActiveProfile" Content="Active project profile" GroupName="ProfileSource" Margin="0 0 16 0"
+                             VerticalAlignment="Center" Checked="_profileSource_Changed" />
+                <RadioButton Name="_radioManualProfile" Content="Manual" GroupName="ProfileSource" VerticalAlignment="Center"
+                             Checked="_profileSource_Changed" />
+            </StackPanel>
+            <Grid Grid.Row="1" Margin="0 0 0 6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="120" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="auto" />
+                </Grid.ColumnDefinitions>
+                <Label Content="Output folder" VerticalAlignment="Center" />
+                <TextBox Name="_tbOutputDirectory" Grid.Column="1" Margin="3" VerticalContentAlignment="Center" />
+                <Button Name="_buttonBrowseOutput" Grid.Column="2" Content="Browse..." Width="80" Height="24" Margin="3" Click="_buttonBrowseOutput_Click" />
+            </Grid>
+            <TextBlock Name="_textProfileHint" Grid.Row="2" TextWrapping="Wrap" Opacity="0.85" FontSize="11" />
+        </Grid>
+        <StackPanel Grid.Row="2" Margin="8 4 12 4">
+            <Label Content="Pipeline steps" FontWeight="SemiBold" Margin="0 0 0 4" />
+            <WrapPanel>
+                <CheckBox Name="_cbValidate" Content="Validate files" IsChecked="True" Margin="0 0 16 4" />
+                <CheckBox Name="_cbRemoveJunk" Content="Remove junk files" Margin="0 0 16 4"
+                          ToolTip="Requires confirmation. Modifies the open GRF in memory only (not saved automatically)." />
+                <CheckBox Name="_cbManifest" Content="Generate manifest" IsChecked="True" Margin="0 0 16 4" />
+                <CheckBox Name="_cbChangelog" Content="Generate changelog" IsChecked="True" Margin="0 0 16 4"
+                          Checked="_changelogOption_Changed" Unchecked="_changelogOption_Changed" />
+                <CheckBox Name="_cbHashes" Content="Generate hashes" IsChecked="True" Margin="0 0 16 4" />
+                <CheckBox Name="_cbExportReport" Content="Export report" IsChecked="True" Margin="0 0 16 4" />
+                <CheckBox Name="_cbExportManifestCsv" Content="Export manifest CSV" IsChecked="True" Margin="0 0 16 4"
+                          ToolTip="When manifest is generated, also writes build-manifest.csv." />
+            </WrapPanel>
+            <CheckBox Name="_cbStopOnErrors" Content="Stop pipeline when validation reports errors" IsChecked="True" Margin="0 4 0 0" />
+        </StackPanel>
+        <Grid Grid.Row="3" Margin="8 0 8 4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="160" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Label Content="Previous manifest" VerticalAlignment="Center"
+                   ToolTip="Optional build-manifest.json to compare against the manifest generated in this run." />
+            <Styles:PathBrowser Grid.Column="1" Name="_pbPreviousManifest" BrowseMode="File"
+                                Filter="Manifest JSON|build-manifest.json;*.json"
+                                IsEnabled="True" Margin="3 0 0 0" />
+        </Grid>
+        <GroupBox Grid.Row="4" Header="Step progress" Margin="8 4 8 4">
+            <ListView Name="_listSteps" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Step" Width="220" DisplayMemberBinding="{Binding DisplayName}" />
+                        <GridViewColumn Header="Status" Width="90" DisplayMemberBinding="{Binding Status}" />
+                        <GridViewColumn Header="Result" Width="80" DisplayMemberBinding="{Binding Result}" />
+                        <GridViewColumn Header="Detail" Width="360" DisplayMemberBinding="{Binding Detail}" />
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </GroupBox>
+        <GroupBox Grid.Row="5" Header="Final result" Margin="8 4 8 4">
+            <TextBox Name="_tbFinalResult" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
+                     BorderThickness="0" Background="Transparent" MinHeight="120" />
+        </GroupBox>
+        <Grid Grid.Row="6" TokeiLibrary:WpfProperties.IsDraggable="True" Height="40" Background="{DynamicResource UIDialogBackground}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="280" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Styles:TkProgressBar x:Name="_progressBar" Margin="8 0 0 0" />
+            <DockPanel Grid.Column="1" HorizontalAlignment="Right" Margin="0 0 8 0">
+                <Button Name="_buttonRun" Content="Run pipeline" Width="100" Height="24" Margin="3" Click="_buttonRun_Click" />
+                <Button Name="_buttonExportJson" Content="Export JSON" Width="95" Height="24" Margin="3" Click="_buttonExportJson_Click" IsEnabled="False" />
+                <Button Name="_buttonExportTxt" Content="Export TXT" Width="90" Height="24" Margin="3" Click="_buttonExportTxt_Click" IsEnabled="False" />
+                <Button Name="_buttonClose" Content="Close" Width="80" Height="24" Margin="3" Click="_buttonClose_Click" />
+            </DockPanel>
+        </Grid>
+    </Grid>
+</Styles:TkWindow>

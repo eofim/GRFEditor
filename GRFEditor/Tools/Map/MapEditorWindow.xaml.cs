@@ -40,9 +40,17 @@ namespace GRFEditor.Tools.Map {
 		private readonly MapEditor _mapEditor;
 		private bool _grfOnly;
 		private bool _updatingTextures;
+		private IList<string> _selectedMapNames;
 
 		public MapEditorWindow() {
 			InitializeComponent();
+		}
+
+		public MapEditorWindow(GrfHolder grfHolder, IList<string> selectedMapNames)
+			: this(grfHolder) {
+			_selectedMapNames = selectedMapNames;
+			_checkBoxGrfOnly.IsChecked = true;
+			_checkBoxGrfOnly.IsEnabled = false;
 		}
 
 		public MapEditorWindow(GrfHolder grfHolder)
@@ -471,14 +479,17 @@ namespace GRFEditor.Tools.Map {
 					throw new Exception("The output file is locked: " + _mapEditor.OutputMapPath);
 				}
 
-				string[] files;
+			string[] files;
 
-				if (_grfOnly) {
-					files = _grfHolder.FileTable.Entries.OrderBy(p => p.FileExactOffset).Select(p => p.RelativePath).Where(p => p.IsExtension(".gat")).Select(Path.GetFileNameWithoutExtension).ToArray();
-				}
-				else {
-					files = Directory.GetFiles(_mapEditor.InputMapPath, "*.gat").ToList().Select(Path.GetFileNameWithoutExtension).ToArray();
-				}
+			if (_selectedMapNames != null && _selectedMapNames.Count > 0) {
+				files = _selectedMapNames.ToArray();
+			}
+			else if (_grfOnly) {
+				files = _grfHolder.FileTable.Entries.OrderBy(p => p.FileExactOffset).Select(p => p.RelativePath).Where(p => p.IsExtension(".gat")).Select(Path.GetFileNameWithoutExtension).ToArray();
+			}
+			else {
+				files = Directory.GetFiles(_mapEditor.InputMapPath, "*.gat").ToList().Select(Path.GetFileNameWithoutExtension).ToArray();
+			}
 
 				if (files.Length == 0) {
 					ErrorHandler.HandleException("No maps have been found.");

@@ -10,6 +10,8 @@ using TokeiLibrary.WPF;
 namespace GRFEditor {
 	public partial class EditorMainWindow : Window {
 		private void _loadEvents() {
+			_loadActiveProfileIndicator();
+
 			_positions.RedoExecuted += _positions_RedoExecuted;
 			_positions.UndoExecuted += _positions_UndoExecuted;
 			_positions.CommandExecuted += _positions_CommandExecuted;

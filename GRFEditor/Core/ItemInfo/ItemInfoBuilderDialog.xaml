@@ -1,0 +1,160 @@
+<Styles:TkWindow x:Class="GRFEditor.Core.ItemInfo.ItemInfoBuilderDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Styles="clr-namespace:TokeiLibrary.WPF.Styles;assembly=TokeiLibrary"
+        xmlns:TokeiLibrary="clr-namespace:TokeiLibrary;assembly=TokeiLibrary"
+        MinHeight="620" Height="720" Width="980" MinWidth="900">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Margin="8 8 8 4">
+            <Label Content="ItemInfo builder" FontWeight="Bold" FontSize="16"/>
+            <TextBlock Name="_textSummary" TextWrapping="Wrap" Opacity="0.9"
+                       Text="Monte entradas iteminfo, valide e insira com preview. Backup automático ao alterar arquivo existente."/>
+            <Rectangle Height="1" Stroke="{DynamicResource SeperatorBrush}" Margin="0 4 0 0"/>
+        </StackPanel>
+        <Grid Grid.Row="1" Margin="8 4 8 4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="120"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Label Content="iteminfo alvo:" VerticalAlignment="Center"/>
+            <Styles:PathBrowser Grid.Column="1" Name="_pbItemInfoPath" BrowseMode="File"
+                                Filter="Lua files|*.lub;*.lua" Margin="4,0,0,0"/>
+        </Grid>
+        <TabControl Grid.Row="2" Name="_tabs" Margin="8 0 8 0">
+            <TabItem Header="Item único">
+                <Grid Margin="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="340"/>
+                        <ColumnDefinition Width="8"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel>
+                            <Grid Margin="0 0 0 4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="140"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Content="ItemId" VerticalAlignment="Center"/>
+                                <TextBox Name="_tbItemId" Grid.Column="1" Height="24" Margin="4,2"/>
+                            </Grid>
+                            <Grid Margin="0 0 0 4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="140"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Content="IdentifiedDisplayName" VerticalAlignment="Center"/>
+                                <TextBox Name="_tbIdentifiedDisplay" Grid.Column="1" Height="24" Margin="4,2"/>
+                            </Grid>
+                            <Grid Margin="0 0 0 4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="140"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Content="UnidentifiedDisplayName" VerticalAlignment="Center"/>
+                                <TextBox Name="_tbUnidentifiedDisplay" Grid.Column="1" Height="24" Margin="4,2"/>
+                            </Grid>
+                            <Grid Margin="0 0 0 4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="140"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Content="IdentifiedResourceName" VerticalAlignment="Center"/>
+                                <TextBox Name="_tbIdentifiedResource" Grid.Column="1" Height="24" Margin="4,2"/>
+                            </Grid>
+                            <Grid Margin="0 0 0 4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="140"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Content="UnidentifiedResourceName" VerticalAlignment="Center"/>
+                                <TextBox Name="_tbUnidentifiedResource" Grid.Column="1" Height="24" Margin="4,2"/>
+                            </Grid>
+                            <Label Content="Description (identified)" Margin="0 4 0 2"/>
+                            <TextBox Name="_tbDescription" AcceptsReturn="True" TextWrapping="Wrap"
+                                     Height="80" VerticalScrollBarVisibility="Auto"/>
+                            <Grid Margin="0 4 0 4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="140"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="140"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Content="SlotCount" VerticalAlignment="Center"/>
+                                <TextBox Name="_tbSlotCount" Grid.Column="1" Height="24" Margin="4,2" Text="0"/>
+                                <Label Content="ClassNum / ViewId" Grid.Column="2" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                <TextBox Name="_tbClassNum" Grid.Column="3" Height="24" Margin="4,2"/>
+                            </Grid>
+                            <Label Content="Item image path" Margin="0 4 0 2"/>
+                            <Styles:PathBrowser Name="_pbItemImage" BrowseMode="File" Filter="Images|*.bmp;*.png;*.jpg"/>
+                            <Label Content="Collection image path" Margin="0 4 0 2"/>
+                            <Styles:PathBrowser Name="_pbCollectionImage" BrowseMode="File" Filter="Images|*.bmp;*.png;*.jpg"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                    <Grid Grid.Column="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="100"/>
+                        </Grid.RowDefinitions>
+                        <Label Content="Bloco Lua gerado" FontWeight="SemiBold"/>
+                        <TextBox Grid.Row="1" Name="_tbGeneratedBlock" IsReadOnly="True" FontFamily="Consolas"
+                                 AcceptsReturn="True" TextWrapping="NoWrap"
+                                 VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
+                        <TextBox Grid.Row="2" Name="_tbValidation" IsReadOnly="True" TextWrapping="Wrap"
+                                 VerticalScrollBarVisibility="Auto" Margin="0 6 0 0"/>
+                    </Grid>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Lote (CSV)">
+                <Grid Margin="4">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="80"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <WrapPanel Margin="0 0 0 6">
+                        <Button Name="_buttonImportCsv" Content="Importar CSV" Width="110" Height="24" Margin="0 0 6 0" Click="_buttonImportCsv_Click"/>
+                        <Button Name="_buttonSelectAllValid" Content="Selecionar válidas" Width="120" Height="24" Margin="0 0 6 0" Click="_buttonSelectAllValid_Click"/>
+                        <Button Name="_buttonSelectNone" Content="Limpar seleção" Width="100" Height="24" Margin="0 0 6 0" Click="_buttonSelectNone_Click"/>
+                    </WrapPanel>
+                    <TextBox Grid.Row="1" Name="_textBatchReport" IsReadOnly="True" TextWrapping="Wrap"
+                             VerticalScrollBarVisibility="Auto" FontFamily="Consolas" AcceptsReturn="True"/>
+                    <DataGrid Grid.Row="2" Name="_gridBatch" AutoGenerateColumns="False" CanUserAddRows="False"
+                              HeadersVisibility="Column" SelectionMode="Extended">
+                        <DataGrid.Columns>
+                            <DataGridCheckBoxColumn Header="✓" Binding="{Binding Selected, UpdateSourceTrigger=PropertyChanged}" Width="36"/>
+                            <DataGridTextColumn Header="L" Binding="{Binding LineNumber}" Width="32" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="ItemId" Binding="{Binding ItemId}" Width="56" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Display" Binding="{Binding IdentifiedDisplayName}" Width="100" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Resource" Binding="{Binding IdentifiedResourceName}" Width="80" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="ClassNum" Binding="{Binding ClassNum}" Width="52" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Status" Binding="{Binding StatusText}" Width="64" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Issues" Binding="{Binding IssuesText}" Width="*" IsReadOnly="True"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+        </TabControl>
+        <WrapPanel Grid.Row="3" Margin="8 6 8 4">
+            <Button Name="_buttonGenerate" Content="Gerar bloco Lua" Width="120" Height="24" Margin="0 0 6 0" Click="_buttonGenerate_Click"/>
+            <Button Name="_buttonValidate" Content="Validar" Width="80" Height="24" Margin="0 0 6 0" Click="_buttonValidate_Click"/>
+            <Button Name="_buttonCopy" Content="Copiar bloco" Width="100" Height="24" Margin="0 0 6 0" Click="_buttonCopy_Click"/>
+            <Button Name="_buttonSaveFile" Content="Salvar em arquivo..." Width="130" Height="24" Margin="0 0 6 0" Click="_buttonSaveFile_Click"/>
+            <Button Name="_buttonInsert" Content="Inserir no iteminfo..." Width="140" Height="24" Margin="0 0 6 0" Click="_buttonInsert_Click"/>
+            <Button Name="_buttonExportJson" Content="Exportar JSON" Width="110" Height="24" Margin="0 0 6 0" Click="_buttonExportJson_Click"/>
+        </WrapPanel>
+        <Grid Grid.Row="4" TokeiLibrary:WpfProperties.IsDraggable="True" Height="40" Background="{DynamicResource UIDialogBackground}">
+            <DockPanel HorizontalAlignment="Right" Margin="0 0 8 0">
+                <Button Name="_buttonClose" Content="Fechar" Width="100" Height="24" Margin="3" Click="_buttonClose_Click"/>
+            </DockPanel>
+        </Grid>
+    </Grid>
+</Styles:TkWindow>

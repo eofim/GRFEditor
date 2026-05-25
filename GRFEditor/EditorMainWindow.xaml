@@ -78,6 +78,13 @@
                     <Label Content="Tools" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="-5 0 -5 0" />
                 </MenuItem.Header>
                 <MenuItem Name="_menuItemValidateGrf" TokeiLibrary:WpfProperties.ImagePath="validity.png" Header="Grf validation" Click="_menuItemValidateGrf_Click" />
+                <MenuItem Name="_menuItemRagnarokValidation" TokeiLibrary:WpfProperties.ImagePath="validity.png" Header="Ragnarok client validation" Click="_menuItemRagnarokValidation_Click" />
+                <MenuItem Name="_menuItemProjectProfiles" TokeiLibrary:WpfProperties.ImagePath="properties.png" Header="Project profiles" Click="_menuItemProjectProfiles_Click"
+                          ToolTip="Manage project profiles (paths, encoding, active profile). Does not open a GRF automatically." />
+                <MenuItem Name="_menuItemBuildPipeline" TokeiLibrary:WpfProperties.ImagePath="pack.png" Header="Build pipeline" Click="_menuItemBuildPipeline_Click"
+                          ToolTip="Run validation and build reports. Does not save the GRF or generate patches automatically." />
+                <MenuItem Name="_menuItemCompareGrfs" TokeiLibrary:WpfProperties.ImagePath="diff.png" Header="Compare GRFs" Click="_menuItemCompareGrfs_Click"
+                          ToolTip="Compare two GRF files by path, size, and MD5. Does not modify GRFs." />
                 <MenuItem Name="_menuItemHardCompression" TokeiLibrary:WpfProperties.ImagePath="pack.png" Header="Hard compression (LZMA)..." Click="_menuItemHardCompression_Click"
                           ToolTip="Recompresses the entire GRF with LZMA and removes duplicate entries. Not compatible with the official Ragnarok client." />
                 <MenuItem Name="_menuItemOpenProgramData" TokeiLibrary:WpfProperties.ImagePath="newFolder.png" Click="_menuItemOpenProgramData_Click" Header="Open roaming data" />
@@ -85,6 +92,10 @@
                 <MenuItem Name="_menuItemImportSprite" TokeiLibrary:WpfProperties.ImagePath="convert.png" Header="Import sprite..." Click="_menuItemImportSprite_Click" />
                 <MenuItem Name="_menuItemCustomAccessoryLua" TokeiLibrary:WpfProperties.ImagePath="convert.png" Header="Custom accessory Lua..." Click="_menuItemCustomAccessoryLua_Click"
                           ToolTip="Gera ou atualiza accessoryid.lub e accname.lub a partir de sprites no GRF (com OpenAI opcional)." />
+                <MenuItem Name="_menuItemCustomAccessoryManager" TokeiLibrary:WpfProperties.ImagePath="convert.png" Header="Custom accessories manager" Click="_menuItemCustomAccessoryManager_Click"
+                          ToolTip="Scan accessory sprites and cross-reference accessoryid.lub / accname.lub (read-only)." />
+                <MenuItem Name="_menuItemItemInfoBuilder" TokeiLibrary:WpfProperties.ImagePath="settings.ico" Header="ItemInfo builder" Click="_menuItemItemInfoBuilder_Click"
+                          ToolTip="Criar e validar entradas iteminfo.lua/lub com preview antes de alterar o arquivo." />
                 <Separator />
                 <MenuItem Name="_menuItemSpriteConverter" TokeiLibrary:WpfProperties.ImagePath="spritemaker.png" Header="Sprite editor" Click="_menuItemSpriteConverter_Click" />
                 <MenuItem Name="_menuItemFlatMapsMaker" TokeiLibrary:WpfProperties.ImagePath="mapEditor.png" Header="Flat maps maker" Click="_menuItemFlatMapsMaker_Click" />
@@ -119,6 +130,8 @@
 			<Styles:FancyButton x:Name="_buttonFancyForward" Height="24" Width="24" TokeiLibrary:WpfProperties.ImagePath="forward.png" Click="_buttonPositionRedo_Click" IsButtonEnabled="False" />
         </DockPanel>
         <DockPanel Grid.Row="0" HorizontalAlignment="Right" Margin="0 0 2 0">
+            <TextBlock x:Name="_textActiveProfile" VerticalAlignment="Center" Margin="0 0 10 0" FontSize="11" Opacity="0.8"
+                       Visibility="Collapsed" TextTrimming="CharacterEllipsis" MaxWidth="180" />
             <Styles:TkProgressBar x:Name="_progressBarComponent" Width="300" />
         </DockPanel>
         <Line Stretch="Fill" Grid.Row="2" StrokeThickness="2" Stroke="{x:Static TokeiLibrary:Configuration.UIGridBackground}" X2="1" StrokeStartLineCap="Square" StrokeEndLineCap="Square" />

@@ -1,0 +1,95 @@
+<Styles:TkWindow x:Class="GRFEditor.Core.ProjectProfiles.ProjectProfilesDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Styles="clr-namespace:TokeiLibrary.WPF.Styles;assembly=TokeiLibrary"
+        xmlns:TokeiLibrary="clr-namespace:TokeiLibrary;assembly=TokeiLibrary"
+        xmlns:Application="clr-namespace:GrfToWpfBridge.Application;assembly=GrfToWpfBridge"
+        MinHeight="520" Height="580" Width="960" MinWidth="880"
+        Loaded="_window_Loaded">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Margin="8 8 8 4">
+            <Label Content="Project profiles" FontWeight="Bold" FontSize="16" Margin="0 0 0 4" />
+            <TextBlock Text="Manage client paths and settings per project. Saving a profile does not open a GRF or change the current editor session."
+                       TextWrapping="Wrap" Margin="0 0 0 4" />
+            <Rectangle Height="1" Stroke="{DynamicResource SeperatorBrush}" Margin="0 2 0 0" />
+        </StackPanel>
+        <Grid Grid.Row="1" Margin="8 4 8 4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="220" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <DockPanel Grid.Column="0">
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0 0 0 4">
+                    <Button Name="_buttonNew" Content="New" Width="52" Height="24" Margin="0 0 4 0" Click="_buttonNew_Click" />
+                    <Button Name="_buttonDuplicate" Content="Duplicate" Width="72" Height="24" Margin="0 0 4 0" Click="_buttonDuplicate_Click" />
+                    <Button Name="_buttonDelete" Content="Delete" Width="58" Height="24" Click="_buttonDelete_Click" />
+                </StackPanel>
+                <ListBox Name="_listProfiles" SelectionChanged="_listProfiles_SelectionChanged" DisplayMemberPath="DisplayName" />
+            </DockPanel>
+            <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
+                <Grid Name="_gridEditor" Margin="0 0 4 0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="160" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Row="0" Content="Name" VerticalAlignment="Center" />
+                    <TextBox Grid.Row="0" Grid.Column="1" Name="_tbName" Margin="3" VerticalAlignment="Center" TextChanged="_editorField_Changed" />
+                    <Label Grid.Row="1" Content="Main GRF" VerticalAlignment="Center" />
+                    <Styles:PathBrowser Grid.Row="1" Grid.Column="1" Name="_pbMainGrf" BrowseMode="File" Filter="Container Files|*.grf;*.gpf;*.thor" Margin="3" TextChanged="_pathField_Changed" />
+                    <Label Grid.Row="2" Content="Data folder" VerticalAlignment="Center" />
+                    <Styles:PathBrowser Grid.Row="2" Grid.Column="1" Name="_pbDataFolder" BrowseMode="Folder" Margin="3" TextChanged="_pathField_Changed" />
+                    <Label Grid.Row="3" Content="Export folder" VerticalAlignment="Center" />
+                    <Styles:PathBrowser Grid.Row="3" Grid.Column="1" Name="_pbExportFolder" BrowseMode="Folder" Margin="3" TextChanged="_pathField_Changed" />
+                    <Label Grid.Row="4" Content="Patch output folder" VerticalAlignment="Center" />
+                    <Styles:PathBrowser Grid.Row="4" Grid.Column="1" Name="_pbPatchOutput" BrowseMode="Folder" Margin="3" TextChanged="_pathField_Changed" />
+                    <Label Grid.Row="5" Content="Client folder" VerticalAlignment="Center" />
+                    <Styles:PathBrowser Grid.Row="5" Grid.Column="1" Name="_pbClientFolder" BrowseMode="Folder" Margin="3" TextChanged="_pathField_Changed" />
+                    <Label Grid.Row="6" Content="Accessory ID (Lua)" VerticalAlignment="Center" />
+                    <Styles:PathBrowser Grid.Row="6" Grid.Column="1" Name="_pbAccessoryId" BrowseMode="File" Filter="Lua files|*.lub;*.lua" Margin="3" TextChanged="_pathField_Changed" />
+                    <Label Grid.Row="7" Content="Accessory name (Lua)" VerticalAlignment="Center" />
+                    <Styles:PathBrowser Grid.Row="7" Grid.Column="1" Name="_pbAccName" BrowseMode="File" Filter="Lua files|*.lub;*.lua" Margin="3" TextChanged="_pathField_Changed" />
+                    <Label Grid.Row="8" Content="Item info (Lua)" VerticalAlignment="Center" />
+                    <Styles:PathBrowser Grid.Row="8" Grid.Column="1" Name="_pbItemInfo" BrowseMode="File" Filter="Lua files|*.lub;*.lua" Margin="3" TextChanged="_pathField_Changed" />
+                    <Label Grid.Row="9" Content="Encoding" VerticalAlignment="Center" />
+                    <Application:EncodingPicker Grid.Row="9" Grid.Column="1" Name="_comboEncoding" Margin="3" IsReadOnly="True" HorizontalAlignment="Left" Width="200" />
+                    <Label Grid.Row="10" Content="Last used view ID" VerticalAlignment="Center" />
+                    <TextBox Grid.Row="10" Grid.Column="1" Name="_tbLastViewId" Margin="3" VerticalAlignment="Center" Width="120" HorizontalAlignment="Left" TextChanged="_editorField_Changed" />
+                </Grid>
+            </ScrollViewer>
+        </Grid>
+        <Border Grid.Row="2" Margin="8 0 8 4" Padding="6" Background="{DynamicResource TabControlBackground}" BorderBrush="{DynamicResource SeperatorBrush}" BorderThickness="1">
+            <StackPanel>
+                <Label Content="Path validation" FontWeight="SemiBold" Padding="0" Margin="0 0 0 2" />
+                <TextBlock Name="_textPathWarnings" Text="Click Validate paths to check the fields above." TextWrapping="Wrap" Foreground="{DynamicResource TextForeground}" />
+            </StackPanel>
+        </Border>
+        <Grid Grid.Row="3" TokeiLibrary:WpfProperties.IsDraggable="True" Height="40" Background="{DynamicResource UIDialogBackground}">
+            <DockPanel Margin="0 0 3 0" HorizontalAlignment="Right">
+                <Button Name="_buttonValidatePaths" Content="Validate paths" Width="110" Height="24" Margin="3" Click="_buttonValidatePaths_Click" />
+                <Button Name="_buttonSetActive" Content="Set active" Width="90" Height="24" Margin="3" Click="_buttonSetActive_Click" />
+                <Button Name="_buttonSave" Content="Save" Width="80" Height="24" Margin="3" Click="_buttonSave_Click" />
+                <Button Name="_buttonClose" Content="Close" Width="80" Height="24" Margin="3" Click="_buttonClose_Click" />
+            </DockPanel>
+        </Grid>
+    </Grid>
+</Styles:TkWindow>

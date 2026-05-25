@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using GRFEditor.ApplicationConfiguration;
+using GRFEditor.Core.ProjectProfiles;
 using TokeiLibrary.WPF.Styles;
 
 namespace GRFEditor.Tools.CustomAccessory {
@@ -29,9 +30,19 @@ namespace GRFEditor.Tools.CustomAccessory {
 				}
 			};
 
-			var lastFolder = GrfEditorConfiguration.CustomAccessoryItemInfoOutputPath;
-			if (!string.IsNullOrEmpty(lastFolder) && Directory.Exists(lastFolder))
-				_textOutputFolder.Text = lastFolder;
+			string profileFolder = ActiveProjectProfile.GetItemInfoOutputFolder();
+			if (!String.IsNullOrEmpty(profileFolder))
+				_textOutputFolder.Text = profileFolder;
+			else {
+				var lastFolder = GrfEditorConfiguration.CustomAccessoryItemInfoOutputPath;
+				if (!string.IsNullOrEmpty(lastFolder) && Directory.Exists(lastFolder))
+					_textOutputFolder.Text = lastFolder;
+			}
+
+			ActiveProjectProfile.ConfirmContinueWithInvalidPaths(
+				this,
+				"Iteminfo builder",
+				ActiveProjectProfile.GetPathWarningsForTool(p => p.ExportFolderPath, p => p.ItemInfoPath));
 
 			_textStatus.Text = _rows.Count + " item(ns).";
 		}
@@ -123,7 +134,9 @@ namespace GRFEditor.Tools.CustomAccessory {
 
 			try {
 				CustomAccessoryItemInfoGenerator.WriteFiles(folder, selected);
-				GrfEditorConfiguration.CustomAccessoryItemInfoOutputPath = folder;
+
+				if (!ActiveProjectProfile.HasActive || String.IsNullOrEmpty(ActiveProjectProfile.GetExportFolderPath()))
+					GrfEditorConfiguration.CustomAccessoryItemInfoOutputPath = folder;
 
 				var itemInfoPath = Path.Combine(folder, "iteminfo.lua");
 				var itemDbPath = Path.Combine(folder, "item_db.yml");

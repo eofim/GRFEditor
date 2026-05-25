@@ -72,9 +72,10 @@ namespace GRFEditor {
 					_miConvertRsw_Anim.Visibility = new string[] { ".rsw", ".gnd", ".gat" }.Any(p => entry.RelativePath.GetExtension() == p) ? Visibility.Visible : Visibility.Collapsed;
 					_miConvertRsm_Anim.Visibility = new string[] { ".rsm2" }.Any(p => entry.RelativePath.GetExtension() == p) ? Visibility.Visible : Visibility.Collapsed;
 					_miConvertRsm_Flat.Visibility = new string[] { ".rsm2" }.Any(p => entry.RelativePath.GetExtension() == p) ? Visibility.Visible : Visibility.Collapsed;
-					_miExportMapFiles.Visibility = selectedEntries.Any(p => MapExtractor.IsSupportedFile(p.RelativePath)) ? Visibility.Visible : Visibility.Collapsed;
+				_miExportMapFiles.Visibility = selectedEntries.Any(p => MapExtractor.IsSupportedFile(p.RelativePath)) ? Visibility.Visible : Visibility.Collapsed;
+				_miGenerateFlatMaps.Visibility = selectedEntries.Any(p => new string[] { ".gat", ".rsw", ".gnd" }.Any(ext => p.RelativePath.GetExtension() == ext)) ? Visibility.Visible : Visibility.Collapsed;
 
-					_miFlagRemove.Visibility = _grfHolder.FileName.IsExtension(".thor") ? Visibility.Visible : Visibility.Collapsed;
+				_miFlagRemove.Visibility = _grfHolder.FileName.IsExtension(".thor") ? Visibility.Visible : Visibility.Collapsed;
 
 					_miSelect.Visibility = Visibility.Visible;
 				}
